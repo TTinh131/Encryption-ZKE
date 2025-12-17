@@ -1,0 +1,419 @@
+/* 1. Layout và background */
+#particles-js {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: var(--bg-primary);
+}
+
+.footer {
+  position: relative;
+  z-index: 20 !important; /* Footer cao nhất */
+  background: var(--bg-card) !important;
+}
+
+.main-content {
+  position: relative;
+  z-index: 10;
+}
+
+.container1 {
+  width: 100%;
+  max-width: 360px;
+  padding: 20px;
+  position: relative;
+  z-index: 10;
+  perspective: 1000px;
+}
+
+.login-content-wrapper {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+/*2. Form box và animation*/
+.form-box {
+  background: rgba(var(--bg-card), 0.5);
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  transform-style: preserve-3d;
+  animation: formEntrance 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+  opacity: 0;
+  transform: rotateX(20deg) translateY(100px);
+  width: 100%;
+}
+
+@keyframes formEntrance {
+  0% {
+    opacity: 0;
+    transform: rotateX(20deg) translateY(100px);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: rotateX(0deg) translateY(0);
+  }
+}
+
+.form-box:hover {
+  transform: rotateX(5deg) rotateY(5deg);
+  transition: transform 0.5s ease;
+}
+
+/*3. Header */
+.form-box h2 {
+  color: var(--primary-color);
+  text-align: center;
+  font-weight: 700;
+  font-size: 24px;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 5px var(--primary-light);
+  }
+  to {
+    text-shadow: 0 0 15px var(--primary-light);
+  }
+}
+
+.form-box p {
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+/* Form Styles */
+.login-form {
+  width: 100%;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 25px;
+  transform: translateZ(10px);
+  animation: fadeInUp 0.5s forwards;
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.input-field {
+  width: 100%;
+  padding: 12px 0;
+  font-size: 15px;
+  color: var(--primary-color);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  outline: none;
+  transition: 0.3s;
+  z-index: 1;
+  position: relative;
+}
+
+.input-field:focus {
+  border-bottom-color: transparent;
+}
+
+.input-group label {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  color: var(--text-muted);
+  font-size: 15px;
+  transition: 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  pointer-events: none;
+}
+
+.input-field:focus ~ label,
+.input-field:valid ~ label {
+  top: -12px;
+  font-size: 12px;
+  color: var(--primary-color);
+}
+
+/*4. Đường glow line dưới input */
+.glow-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--primary-light),
+    var(--primary-color),
+    var(--primary-light),
+    transparent
+  );
+  transition: 0.4s;
+  z-index: 0;
+  background-size: 200% 100%;
+}
+
+.input-field:focus ~ .glow-line {
+  width: 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/*5. password*/
+.password-field {
+  position: relative;
+}
+
+.password-field .btn-password-toggle {
+  position: absolute;
+  right: 0;
+  top: 8px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.1s ease;
+  z-index: 2;
+}
+
+.password-field .btn-password-toggle:hover {
+  color: var(--primary-color);
+}
+
+/*6. forgot password*/
+.remember-forgot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  animation: fadeInUp 0.5s forwards;
+  opacity: 0;
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.remember input {
+  accent-color: var(--primary-color);
+}
+
+.forgot {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: 0.3s;
+  position: relative;
+  font-weight: 500;
+}
+
+.forgot:hover {
+  color: var(--primary-color);
+}
+
+.forgot::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  background-color: var(--primary-color);
+  transition: 0.3s;
+}
+
+.forgot:hover::after {
+  width: 100%;
+  box-shadow: 0 0 5px var(--primary-light);
+}
+
+/*7. button*/
+.login-btn {
+  width: 100%;
+  padding: 12px 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--primary-color);
+  border-radius: 25px;
+  color: var(--primary-color);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.1s;
+  position: relative;
+  overflow: hidden;
+  transform: translateZ(20px);
+  animation: fadeInUp 0.1s forwards;
+  opacity: 0;
+}
+
+.login-btn span {
+  position: relative;
+  z-index: 1;
+  transition: 0.1s;
+}
+
+.login-btn:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* 8. Social authentication */
+.social-auth {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.btn-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 10px;
+  transition: all 0.1s ease;
+}
+
+.btn-social:hover {
+  background: var(--primary-color);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.btn-social i {
+  color: var(--primary-color);
+  transition: color 0.1s ease;
+}
+
+.btn-social:hover i {
+  color: white;
+}
+
+/*9. Divider giữa các section và signup */
+.divider {
+  text-align: center;
+  color: var(--text-secondary);
+  margin: 15px 0;
+  font-size: 14px;
+}
+
+.signup-link {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  animation: fadeInUp 0.5s forwards;
+  opacity: 0;
+}
+
+.signup-link a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.3s;
+  position: relative;
+}
+
+.signup-link a::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  background-color: var(--primary-color);
+  transition: 0.3s;
+}
+
+.signup-link a:hover::after {
+  width: 100%;
+  box-shadow: 0 0 5px var(--primary-light);
+}
+
+/* Alert styles */
+.alert {
+  border-radius: 10px;
+  border: none;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  animation: slideDown 0.3s ease-out;
+}
+
+.alert-danger {
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  color: #dc3545;
+}
+
+.alert i {
+  font-size: 16px;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-feedback.invalid {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  animation: shake 0.5s ease-in-out;
+}
+
+.form-feedback.invalid i {
+  margin-right: 5px;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}

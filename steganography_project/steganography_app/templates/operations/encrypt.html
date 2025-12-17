@@ -1,0 +1,416 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/encrypt.css' %}">
+{% endblock %}
+{% block content %}
+<div class="encrypt-header">
+    <h4>Mã Hóa</h4>
+    <p>Mã hóa dữ liệu với Zero-Knowledge Encryption.<br> 
+        Dữ liệu được mã hóa ngay trên trình duyệt và không gửi plaintext đến server.</p>
+</div>
+
+<div class="container-fluid">
+    <!-- Thông báo trình duyệt không hỗ trợ -->
+    <div id="browserWarning" class="alert alert-warning d-none">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Trình duyệt của bạn có thể không hỗ trợ đầy đủ:</strong> 
+        Một số tính năng mã hóa nâng cao có thể không hoạt động. 
+        Vui lòng sử dụng Chrome, Firefox, Safari hoặc Edge phiên bản mới nhất.
+    </div>
+
+    <form id="encryptionForm" class="encrypt-form">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-5">
+                <div class="input-section-card">
+                    <h5 class="section-title">Loại mã hóa</h5>
+                    <div class="card-options">
+                        <div class="card-option active" data-value="symmetric">
+                            <div class="card-option-icon"><i class="fas fa-exchange-alt"></i></div>
+                            <div class="card-option-text">
+                                <div class="card-option-title">Mã hóa đối xứng</div>
+                                <div class="card-option-desc">Sử dụng cùng một khóa để mã hóa và giải mã</div>
+                            </div>
+                        </div>
+                        <div class="card-option" data-value="asymmetric" {% if not user.is_authenticated %}data-disabled="true"{% endif %}>
+                            <div class="card-option-icon"><i class="fas fa-user-lock"></i></div>
+                            <div class="card-option-text">
+                                <div class="card-option-title">Mã hóa bất đối xứng</div>
+                                <div class="card-option-desc">
+                                    Sử dụng cặp khóa công khai và bí mật {% if not user.is_authenticated %}(Yêu cầu đăng nhập){% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <select class="form-control d-none" id="encryptionType" name="encryption_type">
+                        <option value="symmetric">Mã hóa đối xứng</option>
+                        <option value="asymmetric" {% if not user.is_authenticated %}disabled{% endif %}>
+                            Mã hóa bất đối xứng {% if not user.is_authenticated %}(Yêu cầu đăng nhập){% endif %}
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Thuật toán mã hóa -->
+            <div class="col-md-7">
+                <div class="input-section-card">
+                    <h5 class="section-title"></i>Thuật toán mã hóa</h5>
+                    <div class="card-options">
+                        <div class="card-option active" data-value="AES-256-GCM">
+                            <div class="card-option-icon"><i class="fas fa-shield-alt"></i></div>
+                            <div class="card-option-text">
+                                <div class="card-option-title">AES-256-GCM</div>
+                                <div class="card-option-desc">Mã hóa đối xứng mạnh mẽ</div>
+                            </div>
+                        </div>
+                        <div class="card-option" data-value="XChaCha20-Poly1305">
+                            <div class="card-option-icon"><i class="fas fa-bolt"></i></div>
+                            <div class="card-option-text">
+                                <div class="card-option-title">XChaCha20-Poly1305</div>
+                                <div class="card-option-desc">Mã hóa dòng hiệu suất cao</div>
+                            </div>
+                        </div>
+                        <div class="card-option" data-value="Ascon128a">
+                            <div class="card-option-icon"><i class="fas fa-microchip"></i></div>
+                            <div class="card-option-text">
+                                <div class="card-option-title">Ascon128a</div>
+                                <div class="card-option-desc">Mã hóa nhẹ cho IoT</div>
+                            </div>
+                        </div>
+                    </div>
+                    <select class="form-control d-none" id="algorithm" name="algorithm">
+                        <option value="AES-256-GCM">AES-256-GCM</option>
+                        <option value="XChaCha20-Poly1305">XChaCha20-Poly1305</option>
+                        <option value="Ascon128a">Ascon128a</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-7">
+                <div class="encryption-input-section">
+                    <div class="input-section-card mt-4">
+                        <h5 class="section-title"></i>Loại dữ liệu</h5>
+                        <div class="card-options">
+                            <div class="card-option active" data-value="text">
+                                <div class="card-option-icon">
+                                    <i class="fas fa-font"></i>
+                                </div>
+                                <div class="card-option-text">
+                                    <div class="card-option-title">Văn bản</div>
+                                    <div class="card-option-desc">Nhập trực tiếp văn bản cần mã hóa</div>
+                                </div>
+                            </div>
+                            <div class="card-option" data-value="file">
+                                <div class="card-option-icon">
+                                    <i class="fas fa-file"></i>
+                                </div>
+                                <div class="card-option-text">
+                                    <div class="card-option-title">File</div>
+                                    <div class="card-option-desc">Tải lên file để mã hóa</div>
+                                </div>
+                            </div>
+                        </div>
+                        <select class="form-control d-none" id="inputType" name="input_type">
+                            <option value="text">Văn bản</option>
+                            <option value="file">File</option>
+                        </select>
+                    </div>
+
+                    <div class="input-section-card mt-4">
+                        <h5 class="section-title">Dữ liệu cần mã hóa</h5>
+                        <div class="form-group" id="textInputGroup">
+                            <label for="inputData" class="form-label">Nội dung cần mã hóa</label>
+                            <textarea class="form-control custom-textarea" id="inputData" name="input_data" rows="8" 
+                                      placeholder="Nhập văn bản cần mã hóa..."></textarea>
+                        </div>
+
+                        <div class="form-group d-none" id="fileInputGroup">
+                            <label class="form-label">Chọn file cần mã hóa</label>
+                            <div class="file-drop-zone" id="fileDropArea">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p class="file-text">Kéo & thả file vào đây hoặc <span class="file-link">chọn file</span></p>
+                                <p class="file-text">Hỗ trợ file đến 300MB</p>
+                                <input type="file" class="file-input" id="inputFile" name="file">
+                            </div>
+                            <div id="fileInfo" class="file-info d-none">
+                                <div class="file-name" id="fileName"></div>
+                                <div class="file-size" id="fileSize"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Password group cho mã hóa đối xứng -->
+                    <div id="passwordGroup" class="input-section-card mt-4">
+                        <h5 class="section-title">Mật khẩu mã hóa</h5>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="password" class="form-control custom-textarea" id="password" name="password"
+                                       placeholder="Nhập mật khẩu để mã hóa">
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Hiển thị yêu cầu mật khẩu -->
+                            <div id="passwordRequirements" class="password-requirements" style="display: none;">
+                                <small class="file-text">Mật khẩu phải đáp ứng các yêu cầu sau:</small>
+                                <ul class="requirements-list">
+                                    <li id="reqLength" class="requirement invalid">
+                                        <i class="fas fa-times"></i>Ít nhất 8 ký tự
+                                    </li>
+                                    <li id="reqLowercase" class="requirement invalid">
+                                        <i class="fas fa-times"></i>Chứa chữ thường (a-z)
+                                    </li>
+                                    <li id="reqUppercase" class="requirement invalid">
+                                        <i class="fas fa-times"></i>Chứa chữ hoa (A-Z)
+                                    </li>
+                                    <li id="reqNumber" class="requirement invalid">
+                                        <i class="fas fa-times"></i>Chứa số (0-9)
+                                    </li>
+                                    <li id="reqSpecial" class="requirement invalid">
+                                        <i class="fas fa-times"></i>Chứa ký tự đặc biệt (!@#$%^&*)
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <small class="file-text">Mật khẩu này sẽ được dùng để tạo khóa mã hóa. Hãy giữ nó an toàn!</small>
+                        </div>
+                    </div>
+
+                    <!-- Key management cho mã hóa bất đối xứng -->
+                    <div id="keyManagement" class="input-section-card mt-4" style="display: none;">
+                        <h5 class="section-title">Quản lý khóa</h5>
+                        <div class="form-group">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="useExistingKey">
+                                <label class="form-check-label" for="useExistingKey">
+                                    Sử dụng khóa có sẵn
+                                </label>
+                            </div>
+                            
+                            <div id="keySelection" style="display: none;">
+                                <label class="form-label">Chọn khóa công khai</label>
+                                <select class="form-control" id="keyPairSelect"></select>
+                                <small class="file-text">Chọn khóa công khai từ danh sách khóa đã lưu</small>
+                            </div>
+                            
+                            <div id="keyGeneration">
+                                <button type="button" id="generateKeysBtn" class="btn btn-outline-primary">
+                                    <i class="fas fa-key me-1"></i>Tạo cặp khóa mới
+                                </button>
+                                <small class=" d-block mt-1 file-text">Tạo cặp khóa công khai/bí mật mới cho mã hóa bất đối xứng</small>
+                            </div>
+                        </div>
+                        <div id="keyInfoSection"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cột phải: Thông tin thuật toán và nút hành động -->
+            <div class="col-md-5">
+                <div class="encryption-control-section">
+                    <div class="algorithm-info-card">
+                        <h5 class="section-title">Thông tin thuật toán</h5>
+                        
+                        <div class="algorithm-details" id="algorithmDetails">
+                            <div class="algorithm-detail">
+                                <span class="detail-label">Thuật toán:</span>
+                                <span class="detail-value" id="algoName">AES-256-GCM</span>
+                            </div>
+                            <div class="algorithm-detail">
+                                <span class="detail-label">Loại mã hóa:</span>
+                                <span class="detail-value" id="algoType">Đối xứng</span>
+                            </div>
+                            <div class="algorithm-detail">
+                                <span class="detail-label">Độ an toàn:</span>
+                                <span class="detail-value" id="algoSecurity">Cao</span>
+                            </div>
+                            <div class="algorithm-detail">
+                                <span class="detail-label">Tốc độ:</span>
+                                <span class="detail-value" id="algoSpeed">Nhanh</span>
+                            </div>
+                            <div class="algorithm-detail">
+                                <span class="detail-label">Kích thước khóa:</span>
+                                <span class="detail-value" id="algoKeySize">256 bit</span>
+                            </div>
+                            <div class="algorithm-detail">
+                                <span class="detail-label">Khuyến nghị:</span>
+                                <span class="detail-value" id="algoRecommendation">Sử dụng cho dữ liệu nhạy cảm</span>
+                            </div>
+                        </div>
+                        <div class="algorithm-description mt-3">
+                            <h6 class="mb-2">Mô tả thuật toán</h6>
+                            <p class="file-text" id="algoDescription">
+                                AES-256-GCM là một trong những thuật toán mã hóa đối xứng mạnh nhất hiện nay, 
+                                kết hợp mã hóa khối AES với 256-bit key và chế độ xác thực GCM.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons mt-4">
+            <button type="button" id="encryptBtn" class="btn-encrypt">
+                Mã Hóa
+            </button>
+            <button type="button" id="clearBtn" class="btn btn-outline-secondary">
+                Xóa Hết
+            </button>
+            <a href="{% url 'decrypt' %}" class="btn btn-outline-primary">
+                <i class="fa-solid fa-shuffle"></i>Chuyển sang Giải Mã
+            </a>
+        </div>
+
+        <div id="resultSection" class="result-section d-none mt-4">
+            <div class="result-header">
+                <i class="fas fa-check-circle"></i>
+                <h5 class="mb-0">Kết quả mã hóa</h5>
+            </div>
+            <div class="form-group">
+                <label for="outputData" class="form-label">Dữ liệu đã mã hóa</label>
+                <textarea class="form-control custom-textarea" id="outputData" rows="6" readonly 
+                          placeholder="Kết quả mã hóa sẽ hiển thị ở đây..."></textarea>
+            </div>
+            <div class="mt-3">
+                <button type="button" id="downloadBtn" class="btn btn-success">
+                    <i class="fas fa-download me-2"></i>Tải về
+                </button>
+                <button type="button" id="copyBtn" class="btn btn-outline-primary">
+                    <i class="fas fa-copy me-2"></i>Sao chép
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div id="loadingSection" class="encrypt-loading d-none">
+        <div class="encrypt-spinner"></div>
+        <p>Đang xử lý mã hóa...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    window.userAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
+    
+    // Kiểm tra Web Crypto API support
+    if (!window.crypto || !window.crypto.subtle) {
+        document.getElementById('browserWarning').classList.remove('d-none');
+        document.getElementById('encryptBtn').disabled = true;
+    }
+    function initPasswordStrengthChecker() {
+        const passwordInput = document.getElementById("password");
+        const requirementsList = document.getElementById("passwordRequirements");
+        const encryptBtn = document.getElementById("encryptBtn");
+
+        const reqLength = document.getElementById("reqLength");
+        const reqLowercase = document.getElementById("reqLowercase");
+        const reqUppercase = document.getElementById("reqUppercase");
+        const reqNumber = document.getElementById("reqNumber");
+        const reqSpecial = document.getElementById("reqSpecial");
+
+        function checkPasswordStrength(password) {
+            const requirements = {
+                length: password.length >= 8,
+                lowercase: /[a-z]/.test(password),
+                uppercase: /[A-Z]/.test(password),
+                number: /[0-9]/.test(password),
+                special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+            };
+
+            updateRequirementsUI(requirements);
+            
+            const hasInvalidRequirements = Object.values(requirements).some(req => !req);
+            
+            if (password.length > 0 && hasInvalidRequirements) {
+                requirementsList.style.display = "block";
+            } else {
+                requirementsList.style.display = "none";
+            }
+            
+            return { requirements };
+        }
+
+        function updateRequirementsUI(requirements) {
+            updateRequirement(reqLength, requirements.length, "Ít nhất 8 ký tự");
+            updateRequirement(reqLowercase, requirements.lowercase, "Chứa chữ thường (a-z)");
+            updateRequirement(reqUppercase, requirements.uppercase, "Chứa chữ hoa (A-Z)");
+            updateRequirement(reqNumber, requirements.number, "Chứa số (0-9)");
+            updateRequirement(reqSpecial, requirements.special, "Chứa ký tự đặc biệt (!@#$%^&*)");
+        }
+
+        function updateRequirement(element, isValid, text) {
+            if (isValid) {
+                element.style.display = "none";
+            } else {
+                element.style.display = "flex";
+                element.className = "requirement invalid";
+                element.innerHTML = `<i class="fas fa-times"></i>${text}`;
+            }
+        }
+
+        function validatePassword() {
+            const password = passwordInput.value;
+            const { requirements } = checkPasswordStrength(password);
+            return Object.values(requirements).every(req => req);
+        }
+
+        function updateEncryptButton() {
+            const isPasswordStrong = validatePassword();
+            const encryptionType = document.getElementById("encryptionType").value;
+        
+            if (encryptionType === "symmetric" && passwordInput.value.length > 0) {
+                if (isPasswordStrong) {
+                    encryptBtn.disabled = false;
+                    encryptBtn.style.opacity = "1";
+                    encryptBtn.style.cursor = "pointer";
+                } else {
+                    encryptBtn.disabled = true;
+                    encryptBtn.style.opacity = "0.6";
+                    encryptBtn.style.cursor = "not-allowed";
+                }
+            } else {
+                encryptBtn.disabled = false;
+                encryptBtn.style.opacity = "1";
+                encryptBtn.style.cursor = "pointer";
+            }
+        }
+
+        passwordInput.addEventListener("input", function() {
+            updateEncryptButton();
+        });
+
+        document.getElementById("encryptionType").addEventListener("change", function() {
+            updateEncryptButton();
+        });
+
+        document.getElementById("togglePassword").addEventListener("click", function() {
+            const icon = this.querySelector("i");
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                icon.className = "fas fa-eye-slash";
+            } else {
+                passwordInput.type = "password";
+                icon.className = "fas fa-eye";
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        initPasswordStrengthChecker();
+    });
+</script>
+<script src="{% static 'js/crypto/aes256gcm.js' %}"></script>
+<script src="{% static 'js/crypto/xchacha20.js' %}"></script>
+<script src="{% static 'js/crypto/ascon128a.js' %}"></script>
+<script src="{% static 'js/crypto/x25519.js' %}"></script>
+<script src="{% static 'js/crypto/kyber1024.js' %}"></script>
+<script src="{% static 'js/zke_crypto.js' %}"></script>
+<script src="{% static 'js/encryption.js' %}"></script>
+<script src="{% static 'js/encrypt_ui.js' %}"></script>
+{% endblock %}

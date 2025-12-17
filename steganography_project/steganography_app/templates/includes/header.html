@@ -1,0 +1,93 @@
+<!-- Header -->
+<header class="main-header">
+  <div class="header-content">
+    <div class="header-left">
+      <!-- Hiển thị tên người dùng khi đã đăng nhập -->
+      {% if user.is_active %}
+      <div class="user-greeting">
+        <span class="greeting-text"
+          >Xin chào, <strong>{{ user.username }}</strong>!</span
+        >
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="header-right">
+      <div class="header-actions">
+        <div class="header-menu-dropdown">
+          <button class="header-menu-toggle" id="headerMenuToggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="header-dropdown-menu" id="headerDropdownMenu">
+            <!-- chức năng nhanh -->
+            <!-- User đăng nhập -->
+            {% if user.is_active %}
+            <div class="header-menu-section">
+              <div class="header-menu-item">
+                <button class="header-menu-link" title="Thông báo">
+                  <i class="fas fa-bell"></i>
+                  <span>Thông báo</span>
+                </button>
+              </div>
+              <div class="header-menu-item">
+                <a href="{% url 'profile' %}" class="header-menu-link">
+                  <i class="fas fa-user"></i>
+                  <span>Hồ Sơ</span>
+                </a>
+              </div>
+              <div class="header-menu-item">
+                <a href="/dashboard/" class="header-menu-link">
+                  <i class="fas fa-tachometer-alt"></i>
+                  <span>Dashboard</span>
+                </a>
+              </div>
+              <div class="header-menu-divider"></div>
+              <div class="header-menu-item">
+                <a href="{% url 'logout' %}" class="header-menu-link logout">
+                  <i class="fas fa-sign-out-alt"></i>
+                  <span>Đăng Xuất</span>
+                </a>
+              </div>
+            </div>
+            {% else %}
+            <div class="header-menu-section">
+              <div class="header-menu-item">
+                <a href="{% url 'register' %}" class="header-menu-link register">
+                  <i class="fas fa-user-plus"></i>
+                  <span>Đăng Ký</span>
+                </a>
+              </div>
+              <div class="header-menu-item">
+                <a href="{% url 'login' %}" class="header-menu-link">
+                  <i class="fas fa-sign-in-alt"></i>
+                  <span>Đăng Nhập</span>
+                </a>
+              </div>
+            </div>
+            {% endif %}
+            <div class="header-menu-section">
+              <div class="header-menu-item">
+                <button
+                  class="header-menu-link"
+                  id="themeToggle"
+                  title="Đổi theme"
+                >
+                  <i class="fas fa-palette"></i>
+                  <span>Đổi theme</span>
+                </button>
+              </div>
+              <div class="header-menu-section">
+                <div class="header-menu-item">
+                  <button class="header-menu-link" title="Trợ giúp">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Trợ giúp</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

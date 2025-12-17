@@ -1,0 +1,694 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}SecureMedia - Quản Lý File{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/file_management.css' %}">
+<link rel="stylesheet" href="{% static 'css/activity_history.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="header-history">
+        <h1 class="page-title">Quản Lý File</h1>
+        <p>Quản lý tất cả file đã upload và xử lý</p>
+    </div>
+
+    <!-- Kiểm tra cấu hình -->
+    {% if not user_settings.save_files %}
+    <div class="warning-alert">
+        <i class="fas fa-exclamation-triangle warning-icon"></i>
+        <div class="warning-content">
+            <h4>Tính năng đang tắt</h4>
+            <p>Lưu metadata file đang được tắt trong cài đặt. Các file mới sẽ không được lưu thông tin.</p>
+            <a href="{% url 'profile' %}#settings" class="btn btn-outline-primary mt-2">
+                <i class="fas fa-cog me-1"></i> Đến cài đặt
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if user_settings.save_files %}
+    <!-- Thống kê -->
+    <div class="stats-grid">
+        <div class="stat-card" onclick="filterByType('')">
+            <div class="stat-value">{{ stats.total|default:0 }}</div>
+            <div class="stat-label">Tổng số file</div>
+        </div>
+        <div class="stat-card" onclick="filterBySource('encrypted')">
+            <div class="stat-value">{{ stats.encrypted|default:0 }}</div>
+            <div class="stat-label">File mã hóa</div>
+        </div>
+        <div class="stat-card" onclick="filterBySource('stego')">
+            <div class="stat-value">{{ stats.stego|default:0 }}</div>
+            <div class="stat-label">File giấu tin</div>
+        </div>
+        <div class="stat-card" onclick="filterByType('document')">
+            <div class="stat-value">{{ stats.documents|default:0 }}</div>
+            <div class="stat-label">Tài liệu</div>
+        </div>
+        <div class="stat-card" onclick="filterByType('image')">
+            <div class="stat-value">{{ stats.images|default:0 }}</div>
+            <div class="stat-label">Hình ảnh</div>
+        </div>
+        <div class="stat-card" onclick="filterByType('audio')">
+            <div class="stat-value">{{ stats.audio|default:0 }}</div>
+            <div class="stat-label">Âm thanh</div>
+        </div>
+    </div>
+
+    <!-- Bộ lọc -->
+    <div class="filters-card">
+        <form method="get" class="filter-row" id="filterForm">
+            <div class="filter-group">
+                <label class="filter-label">Nguồn file</label>
+                <select class="filter-select" name="source" id="fileSource">
+                    <option value="">Tất cả</option>
+                    {% for value, label in file_sources %}
+                    <option value="{{ value }}" {% if filters.file_source == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Loại file</label>
+                <select class="filter-select" name="type" id="fileType">
+                    <option value="">Tất cả</option>
+                    {% for value, label in file_types %}
+                    <option value="{{ value }}" {% if filters.file_type == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Khoảng thời gian</label>
+                <select class="filter-select" name="date_range" id="dateRange">
+                    <option value="">Tất cả</option>
+                    <option value="today" {% if filters.date_range == 'today' %}selected{% endif %}>Hôm nay</option>
+                    <option value="week" {% if filters.date_range == 'week' %}selected{% endif %}>Tuần này</option>
+                    <option value="month" {% if filters.date_range == 'month' %}selected{% endif %}>Tháng này</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <div class="d-flex gap-2">
+                    <a href="{% url 'file_management' %}" class="btn-action">
+                        <i class="fas fa-refresh me-1"></i> Đặt lại
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Actions Bar -->
+    <div class="actions-bar" id="actionsBar" style="display: none;">
+        <div class="bulk-actions">
+            <div class="custom-checkbox" id="selectAllCheckbox"></div>
+            <span class="selected-count" id="selectedCount">0 file được chọn</span>
+        </div>
+        <div class="action-buttons">
+            <button class="btn-action btn-success" id="downloadSelectedBtn" onclick="downloadSelectedFiles()">
+                <i class="fas fa-download me-1"></i> Tải về (ZIP)
+            </button>
+            <button class="btn-action btn-danger" id="deleteSelectedBtn">
+                <i class="fas fa-trash me-1"></i> Xóa đã chọn
+            </button>
+        </div>
+    </div>
+
+    <!-- Danh sách file -->
+    <div class="files-table activities-table" id="filesTable">
+        <!-- Table Header -->
+        <div class="table-header table-header-files">
+            <div class="table-cell checkbox-cell"></div>
+            <div class="table-cell index-cell">#</div>
+            <div class="table-cell cell-header">Tên file</div>
+            <div class="table-cell cell-header">Loại</div>
+            <div class="table-cell cell-header">Nguồn</div>
+            <div class="table-cell cell-header">Kích thước</div>
+            <div class="table-cell cell-header">Ngày upload</div>
+            <div class="table-cell cell-header">Hành động</div>
+        </div>
+
+        <!-- Table Body -->
+        {% if files %}
+            {% for file in files %}
+            <div class="table-row table-row-files" data-file-id="{{ file.id }}" data-file-type="{{ file.file_type }}" data-file-source="{{ file.file_source }}">
+                <div class="table-cell checkbox-cell">
+                    <div class="file-checkbox activity-checkbox" data-id="{{ file.id }}"></div>
+                </div>
+
+                <div class="table-cell index-cell">{{ forloop.counter0|add:files.start_index }}</div>
+
+                <div class="table-cell file-name-cell">
+                    <div class="text-truncate" title="{{ file.name_original }}">
+                        <i class="fas 
+                            {% if file.file_type == 'image' %}fa-image text-success
+                            {% elif file.file_type == 'audio' %}fa-music text-primary
+                            {% elif file.file_type == 'video' %}fa-video text-danger
+                            {% elif file.file_type == 'document' %}fa-file-pdf text-warning
+                            {% elif file.file_type == 'encrypted' %}fa-lock text-info
+                            {% elif file.file_type == 'stego' %}fa-eye-slash text-purple
+                            {% else %}fa-file text-secondary{% endif %}
+                            me-2"></i>
+                        <strong>{{ file.name_original }}</strong>
+                    </div>
+                    <div class="text-truncate small" title="{{ file.name_stored }}">
+                        {{ file.name_stored|truncatechars:30 }}
+                    </div>
+                </div>
+
+                <div class="table-cell">
+                    {% if file.file_type == 'image' %}
+                    <span class="activity-type image-badge">
+                        <i class="fas fa-image"></i>
+                        <span>Hình ảnh</span>
+                    </span>
+                    {% elif file.file_type == 'audio' %}
+                    <span class="activity-type audio-badge">
+                        <i class="fas fa-music"></i>
+                        <span>Âm thanh</span>
+                    </span>
+                    {% elif file.file_type == 'document' %}
+                    <span class="activity-type document-badge">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Tài liệu</span>
+                    </span>
+                    {% elif file.file_type == 'encrypted' %}
+                    <span class="activity-type encrypted-badge">
+                        <i class="fas fa-lock"></i>
+                        <span>Mã hóa</span>
+                    </span>
+                    {% elif file.file_type == 'stego' %}
+                    <span class="activity-type stego-badge">
+                        <i class="fas fa-eye-slash"></i>
+                        <span>Giấu tin</span>
+                    </span>
+                    {% else %}
+                    <span class="activity-type other-badge">
+                        <i class="fas fa-file"></i>
+                        <span>Khác</span>
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div class="table-cell">
+                    {% if file.file_source == 'encrypted' %}
+                    <span class="status-badge source-encrypted">
+                        <i class="fas fa-lock"></i>
+                        <span>File mã hóa</span>
+                    </span>
+                    {% elif file.file_source == 'stego' %}
+                    <span class="status-badge source-stego">
+                        <i class="fas fa-eye-slash"></i>
+                        <span>File giấu tin</span>
+                    </span>
+                    {% else %}
+                    <span class="status-badge source-other">
+                        <i class="fas fa-file"></i>
+                        <span>File khác</span>
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div class="table-cell">
+                    {{ file.file_size|filesizeformat }}
+                </div>
+
+                <div class="table-cell">
+                    <small>{{ file.uploaded_at|date:"d/m/Y H:i" }}</small>
+                </div>
+
+                <div class="table-cell action-buttons">
+                    <a href="javascript:void(0);" class="btn-icon view-file-btn" data-file-id="{{ file.id }}" title="Xem chi tiết">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    <a href="{% url 'file_download' file.id %}" class="btn-icon download-file-btn" title="Tải xuống">
+                        <i class="fas fa-download"></i>
+                    </a>
+                    
+                    {% if file.file_source == 'encrypted' %}
+                    <a href="javascript:void(0);" class="btn-icon decrypt-file-btn" 
+                       data-file-id="{{ file.id }}" 
+                       data-file-name="{{ file.name_original }}"
+                       data-file-type="{{ file.file_type }}"
+                       title="Giải mã">
+                        <i class="fas fa-unlock"></i>
+                    </a>
+                    {% elif file.file_source == 'stego' %}
+                    <a href="javascript:void(0);" class="btn-icon extract-file-btn" 
+                       data-file-id="{{ file.id }}"
+                       data-file-name="{{ file.name_original }}"
+                       data-file-type="{{ file.file_type }}"
+                       title="Trích xuất">
+                        <i class="fas fa-search"></i>
+                    </a>
+                    {% endif %}
+                    
+                    <a href="javascript:void(0);" class="btn-icon delete-file-btn" data-file-id="{{ file.id }}" title="Xóa file">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <!-- Empty state -->
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-folder-open"></i>
+                </div>
+                <h3 class="empty-title">Chưa có file nào</h3>
+                <p class="empty-description">
+                    Các file bạn upload và xử lý sẽ xuất hiện ở đây. Hãy bắt đầu với mã hóa hoặc giấu tin để tạo file đầu tiên.
+                </p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <a href="{% url 'encrypt' %}" class="btn-action btn-primary">Mã hóa file</a>
+                    <a href="{% url 'hide' %}" class="btn-action btn-warning">Giấu tin</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Phân trang -->
+    {% if files.has_other_pages %}
+    <div class="pagination">
+        {% if files.has_previous %}
+        <a href="?page={{ files.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="pagination-btn">
+            <i class="fas fa-chevron-left"></i> Trước
+        </a>
+        {% else %}
+        <span class="pagination-btn disabled">
+            <i class="fas fa-chevron-left"></i> Trước
+        </span>
+        {% endif %}
+        
+        <span class="pagination-info">
+            Trang {{ files.number }} / {{ files.paginator.num_pages }}
+        </span>
+        
+        {% if files.has_next %}
+        <a href="?page={{ files.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="pagination-btn">
+            Sau <i class="fas fa-chevron-right"></i>
+        </a>
+        {% else %}
+        <span class="pagination-btn disabled">
+            Sau <i class="fas fa-chevron-right"></i>
+        </span>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% endif %}
+</div>
+
+<!-- Modal chi tiết file -->
+<div class="modal-overlay" id="fileDetailsModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Chi tiết file</h3>
+            <button class="modal-close" id="closeFileModalBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body" id="fileDetailsContent">
+            <!-- Nội dung chi tiết -->
+        </div>
+        <div class="modal-actions">
+            <a href="#" class="btn-action btn-primary" id="downloadFromModal">
+                <i class="fas fa-download me-1"></i> Tải xuống
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận giải mã/trích xuất -->
+<div class="modal-overlay" id="processFileModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="processModalTitle">Xử lý file</h3>
+            <button class="modal-close" id="closeProcessModalBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body" id="processFileContent">
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Đang chuẩn bị dữ liệu...</p>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-action" id="cancelProcessBtn">
+                <i class="fas fa-times me-1"></i> Hủy
+            </button>
+            <a href="#" class="btn-action btn-primary" id="confirmProcessBtn">
+                <i class="fas fa-play me-1"></i> Tiếp tục
+            </a>
+        </div>
+    </div>
+</div>
+{% csrf_token %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/file_management.js' %}"></script>
+<script>
+let token = '{{ csrf_token }}';
+
+// Hàm lọc
+function filterByType(type) {
+    document.getElementById('fileType').value = type;
+    document.getElementById('filterForm').submit();
+}
+
+function filterBySource(source) {
+    document.getElementById('fileSource').value = source;
+    document.getElementById('filterForm').submit();
+}
+
+// Hàm hiển thị loại file
+function getFileTypeDisplay(fileType) {
+    const typeMap = {
+        'image': 'Hình ảnh',
+        'audio': 'Âm thanh',
+        'document': 'Tài liệu',
+        'encrypted': 'File mã hóa',
+        'stego': 'File giấu tin',
+        'other': 'Khác'
+    };
+    return typeMap[fileType] || fileType;
+}
+
+// Hiển thị tên nguồn file
+function getFileSourceDisplay(fileSource) {
+    const sourceMap = {
+        'encrypted': 'File mã hóa',
+        'stego': 'File giấu tin',
+        'other': 'File khác'
+    };
+    return sourceMap[fileSource] || fileSource;
+}
+
+// Lưu thông tin file vào sessionStorage để trang giải mã/trích xuất sử dụng
+function saveFileInfoForProcessing(fileId, fileName, fileType, fileSource, action) {
+    const fileInfo = {
+        fileId: fileId,
+        fileName: fileName,
+        fileType: fileType,
+        fileSource: fileSource,
+        action: action,
+        timestamp: new Date().getTime()
+    };
+    
+    sessionStorage.setItem('fileProcessingInfo', JSON.stringify(fileInfo));
+    console.log('Đã lưu thông tin file cho xử lý:', fileInfo);
+}
+
+// Hàm xử lý khi nhấn nút giải mã
+function handleDecryptClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const fileId = this.dataset.fileId;
+    const fileName = this.dataset.fileName;
+    const fileType = this.dataset.fileType;
+    
+    // Hiển thị modal loading
+    const modal = document.getElementById('processFileModal');
+    const modalTitle = document.getElementById('processModalTitle');
+    const modalContent = document.getElementById('processFileContent');
+    const confirmBtn = document.getElementById('confirmProcessBtn');
+    const cancelBtn = document.getElementById('cancelProcessBtn');
+    
+    modalTitle.textContent = 'Đang tải thông tin...';
+    modalContent.innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Đang kiểm tra file...</p>
+        </div>
+    `;
+    modal.classList.add('active');
+    
+    // Gọi API kiểm tra file
+    fetch(`/api/file/${fileId}/auto-fill-data/`)
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                showModalWithError(fileName, data.error || 'Không thể xử lý file');
+                return;
+            }
+            
+            if (!data.form_data.file_exists) {
+                showModalWithError(fileName, 'File không tồn tại vì lý do bảo mật.');
+                return;
+            }
+            
+            const formData = data.form_data;
+            
+            // Cập nhật nội dung modal với thông tin chi tiết
+            modalTitle.textContent = 'Giải mã file';
+            
+            let contentHTML = `
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>Đã tìm thấy file và có thể tự động điền thông tin</strong>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Tên file:</span>
+                    <span class="detail-value">${fileName}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Loại file:</span>
+                    <span class="detail-value">${getFileTypeDisplay(formData.file_type)}</span>
+                </div>`;
+            
+            if (formData.algorithm) {
+                contentHTML += `
+                <div class="detail-item">
+                    <span class="detail-label">Thuật toán:</span>
+                    <span class="detail-value">${formData.algorithm}</span>
+                </div>`;
+            }
+            
+            if (formData.parameters) {
+                contentHTML += `
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Thông tin sẽ được điền tự động:</strong>
+                    <div class="mt-2 small">
+                `;
+                
+                for (const [key, value] of Object.entries(formData.parameters)) {
+                    contentHTML += `<div>• ${key}: ${value}</div>`;
+                }
+                
+                contentHTML += `</div></div>`;
+            }
+            
+            contentHTML += `
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Bạn sẽ được chuyển đến trang giải mã với các thông tin đã điền sẵn.
+                    Vui lòng kiểm tra và nhập mật khẩu nếu cần.
+                </div>`;
+            
+            modalContent.innerHTML = contentHTML;
+            
+            // Cập nhật nút tiếp tục
+            confirmBtn.textContent = 'Tiếp tục';
+            confirmBtn.className = 'btn-action btn-primary';
+            
+            // Tạo URL redirect với thông tin
+            let redirectUrl = `/decrypt/?file_id=${fileId}&auto_fill=true`;
+            if (formData.algorithm) {
+                redirectUrl += `&algorithm=${encodeURIComponent(formData.algorithm)}`;
+            }
+            if (formData.method) {
+                redirectUrl += `&method=${encodeURIComponent(formData.method)}`;
+            }
+            
+            // Gán sự kiện click cho nút tiếp tục
+            confirmBtn.onclick = function(e) {
+                e.preventDefault();
+                window.location.href = redirectUrl;
+            };
+            
+            cancelBtn.textContent = 'Hủy';
+            cancelBtn.className = 'btn-action';
+            cancelBtn.onclick = function(e) {
+                e.preventDefault();
+                modal.classList.remove('active');
+            };
+        })
+        .catch(error => {
+            console.error('Lỗi khi lấy dữ liệu tự động điền:', error);
+            showModalWithError(fileName, `Lỗi hệ thống: ${error.message}`);
+        });
+}
+
+// Hàm xử lý khi nhấn nút trích xuất
+function handleExtractClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const fileId = this.dataset.fileId;
+    const fileName = this.dataset.fileName;
+    const fileType = this.dataset.fileType;
+    
+    // Hiển thị modal loading
+    const modal = document.getElementById('processFileModal');
+    const modalTitle = document.getElementById('processModalTitle');
+    const modalContent = document.getElementById('processFileContent');
+    const confirmBtn = document.getElementById('confirmProcessBtn');
+    const cancelBtn = document.getElementById('cancelProcessBtn');
+    
+    modalTitle.textContent = 'Đang tải thông tin...';
+    modalContent.innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Đang kiểm tra file...</p>
+        </div>
+    `;
+    modal.classList.add('active');
+    
+    // Gọi API kiểm tra file
+    fetch(`/api/file/${fileId}/auto-fill-data/`)
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                showModalWithError(fileName, data.error || 'Không thể xử lý file');
+                return;
+            }
+            
+            if (!data.form_data.file_exists) {
+                showModalWithError(fileName, 'File không tồn tại. Vui lòng thực hiện giấu tin và trích xuất lại bằng phương pháp tương ứng.');
+                return;
+            }
+            
+            const formData = data.form_data;
+            
+            // Cập nhật nội dung modal với thông tin chi tiết
+            modalTitle.textContent = 'Trích xuất tin ẩn';
+            
+            let contentHTML = `
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>Đã tìm thấy file và có thể tự động điền thông tin</strong>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Tên file:</span>
+                    <span class="detail-value">${fileName}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Loại file:</span>
+                    <span class="detail-value">${getFileTypeDisplay(formData.file_type)}</span>
+                </div>`;
+            
+            if (formData.algorithm) {
+                contentHTML += `
+                <div class="detail-item">
+                    <span class="detail-label">Thuật toán:</span>
+                    <span class="detail-value">${formData.algorithm}</span>
+                </div>`;
+            }
+            
+            if (formData.method) {
+                contentHTML += `
+                <div class="detail-item">
+                    <span class="detail-label">Phương pháp:</span>
+                    <span class="detail-value">${formData.method}</span>
+                </div>`;
+            }
+            
+            if (formData.parameters) {
+                contentHTML += `
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Thông tin sẽ được điền tự động:</strong>
+                    <div class="mt-2 small">
+                `;
+                
+                for (const [key, value] of Object.entries(formData.parameters)) {
+                    contentHTML += `<div>• ${key}: ${value}</div>`;
+                }
+                
+                contentHTML += `</div></div>`;
+            }
+            
+            contentHTML += `
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Bạn sẽ được chuyển đến trang trích xuất với các thông tin đã điền sẵn.
+                    Vui lòng kiểm tra và nhập mật khẩu nếu cần.
+                </div>`;
+            
+            modalContent.innerHTML = contentHTML;
+            
+            // Cập nhật nút tiếp tục
+            confirmBtn.textContent = 'Tiếp tục';
+            confirmBtn.className = 'btn-action btn-primary';
+            
+            // Tạo URL redirect với thông tin
+            let redirectUrl = `/extract/?file_id=${fileId}&auto_fill=true`;
+            if (formData.algorithm) {
+                redirectUrl += `&algorithm=${encodeURIComponent(formData.algorithm)}`;
+            }
+            if (formData.method) {
+                redirectUrl += `&method=${encodeURIComponent(formData.method)}`;
+            }
+            
+            // Gán sự kiện click cho nút tiếp tục
+            confirmBtn.onclick = function(e) {
+                e.preventDefault();
+                window.location.href = redirectUrl;
+            };
+            
+            cancelBtn.textContent = 'Hủy';
+            cancelBtn.className = 'btn-action';
+            cancelBtn.onclick = function(e) {
+                e.preventDefault();
+                modal.classList.remove('active');
+            };
+        })
+        .catch(error => {
+            console.error('Lỗi khi lấy dữ liệu tự động điền:', error);
+            showModalWithError(fileName, `Lỗi hệ thống: ${error.message}`);
+        });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Sự kiện cho các nút giải mã
+    document.querySelectorAll('.decrypt-file-btn').forEach(btn => {
+        btn.addEventListener('click', handleDecryptClick);
+    });
+    
+    // Sự kiện cho các nút trích xuất
+    document.querySelectorAll('.extract-file-btn').forEach(btn => {
+        btn.addEventListener('click', handleExtractClick);
+    });
+    
+    // Đóng modal xử lý
+    document.getElementById('closeProcessModalBtn')?.addEventListener('click', function() {
+        document.getElementById('processFileModal').classList.remove('active');
+    });
+    
+    document.getElementById('cancelProcessBtn')?.addEventListener('click', function() {
+        document.getElementById('processFileModal').classList.remove('active');
+    });
+    
+    // Sự kiện cho bộ lọc
+    document.querySelectorAll('.filter-select').forEach(select => {
+        select.addEventListener('change', function() {
+            document.getElementById('filterForm').submit();
+        });
+    });
+});
+</script>
+{% endblock %}

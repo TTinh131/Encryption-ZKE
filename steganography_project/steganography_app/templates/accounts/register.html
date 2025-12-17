@@ -1,0 +1,343 @@
+{% extends 'base.html' %} {% load static %} {% load socialaccount %} {% block title %}SecureMedia - Đăng Ký{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}" />
+<link rel="stylesheet" href="{% static 'css/register.css' %}" />
+<link
+  href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Poppins:wght@300;400;500;600&family=Rajdhani:wght@400;500&display=swap"
+  rel="stylesheet"
+/>
+{% endblock %} {% block content %}
+<!-- Nền particles -->
+<div id="particles-js"></div>
+
+<!-- Main -->
+<div class="login-content-wrapper">
+  <div class="container1">
+    <div class="form-box">
+      <h2>ĐĂNG KÝ</h2>
+      <p>Đăng ký để bắt có trải nghiệm tốt hơn</p>
+
+      <form class="login-form" method="post" novalidate autocomplete="off">
+        {% csrf_token %}
+
+        <!-- Hiển thị lỗi chung của form -->
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          {% for error in form.non_field_errors %}
+          <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span>{{ error }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="input-group">
+          <input
+            type="text"
+            id="id_username"
+            name="username"
+            required
+            class="input-field"
+            autocomplete="off"
+            value="{{ form.username.value|default_if_none:'' }}"
+          />
+          <label for="id_username">Tên đăng nhập</label>
+          <div class="glow-line"></div>
+
+          {% if form.username.errors %}
+          <div class="form-feedback invalid">
+            <i class="fas fa-exclamation-circle me-1"></i>
+            {% for error in form.username.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="input-group">
+          <input
+            type="email"
+            id="id_email"
+            name="email"
+            required
+            class="input-field"
+            autocomplete="off"
+            value="{{ form.email.value|default_if_none:'' }}"
+          />
+          <label for="id_email">Email</label>
+          <div class="glow-line"></div>
+
+          {% if form.email.errors %}
+          <div class="form-feedback invalid">
+            <i class="fas fa-exclamation-circle me-1"></i>
+            {% for error in form.email.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="input-group password-field">
+          <input
+            type="password"
+            id="id_password1"
+            name="password1"
+            required
+            class="input-field"
+            autocomplete="off"
+          />
+          <label for="id_password1">Mật khẩu</label>
+          <button type="button" class="btn-password-toggle">
+            <i class="fas fa-eye"></i>
+          </button>
+          <div class="glow-line"></div>
+
+          <!-- yêu cầu mk - Chỉ hiện khi chưa đáp ứng -->
+          <div
+            class="requirements-list"
+            id="requirementsList"
+            style="display: none"
+          >
+            <div class="requirement invalid" id="reqLength">
+              <i class="fas fa-times"></i>Ít nhất 8 ký tự
+            </div>
+            <div class="requirement invalid" id="reqLowercase">
+              <i class="fas fa-times"></i>Chứa chữ thường (a-z)
+            </div>
+            <div class="requirement invalid" id="reqUppercase">
+              <i class="fas fa-times"></i>Chứa chữ hoa (A-Z)
+            </div>
+            <div class="requirement invalid" id="reqNumber">
+              <i class="fas fa-times"></i>Chứa số (0-9)
+            </div>
+            <div class="requirement invalid" id="reqSpecial">
+              <i class="fas fa-times"></i>Chứa ký tự đặc biệt (!@#$%^&*)
+            </div>
+          </div>
+
+          {% if form.password1.errors %}
+          <div class="form-feedback invalid">
+            <i class="fas fa-exclamation-circle me-1"></i>
+            {% for error in form.password1.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="input-group password-field">
+          <input
+            type="password"
+            id="id_password2"
+            name="password2"
+            required
+            class="input-field"
+            autocomplete="off"
+          />
+          <label for="id_password2">Xác nhận mật khẩu</label>
+          <button type="button" class="btn-password-toggle">
+            <i class="fas fa-eye"></i>
+          </button>
+          <div class="glow-line"></div>
+
+          <div
+            class="form-feedback invalid"
+            id="passwordMatchFeedback"
+            style="display: none"
+          >
+            <i class="fas fa-exclamation-circle me-1"></i>Mật khẩu xác nhận
+            không khớp
+          </div>
+
+          {% if form.password2.errors %}
+          <div class="form-feedback invalid">
+            <i class="fas fa-exclamation-circle me-1"></i>
+            {% for error in form.password2.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- điều khoản dịch vụ -->
+        <div class="terms-agreement">
+          <div class="terms-checkbox">
+            <input
+              type="checkbox"
+              id="agreeTerms"
+              name="agree_terms"
+              required
+            />
+            <label for="agreeTerms" class="terms-label">
+              Tôi đồng ý với
+              <a href="{% url 'terms_of_service' %}" class="forgot terms-links"
+                >Điều khoản dịch vụ</a
+              >
+              và
+              <a href="{% url 'terms_of_service' %}" class="forgot terms-links"
+                >Chính sách bảo mật</a
+              >
+            </label>
+          </div>
+          <div
+            class="form-feedback invalid terms-feedback"
+            id="termsFeedback"
+            style="display: none"
+          >
+            <i class="fas fa-exclamation-circle me-1"></i>Vui lòng đồng ý với
+            điều khoản dịch vụ
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="login-btn btn btn-online-primary"
+          id="submitBtn"
+        >
+          <span>ĐĂNG KÝ</span>
+          <div class="btn-glow"></div>
+        </button>
+
+        <div class="divider">
+          <span>Hoặc đăng ký với</span>
+        </div>
+
+        <div class="social-auth">
+          <a href="#" class="btn btn-primary" onclick="openGoogleModal(event)">
+            <i class="fab fa-google"></i>
+            <span>Tiếp tục với Google</span>
+          </a>
+        </div>
+
+        <div class="signup-link">
+          Đã có tài khoản? <a href="{% url 'login' %}">Đăng nhập ngay</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Modal xác nhận đăng nhập Google -->
+    <div
+      id="googleLoginModal"
+      class="modal-backdrop-custom"
+      style="display: none"
+    >
+      <div class="modal-custom">
+        <div class="form-box">
+          <h2>Đăng nhập bằng Google</h2>
+        </div>
+
+        <div class="modal-body">
+          <p>
+            Bạn sắp đăng nhập bằng tài khoản Google của mình. Hãy đảm bảo rằng
+            bạn tin tưởng ứng dụng này trước khi tiếp tục.
+          </p>
+
+          <div class="modal-actions">
+            <form
+              method="post"
+              action="{% provider_login_url 'google' process='login' %}"
+            >
+              {% csrf_token %}
+              <button
+                type="submit"
+                class="login-btn btn btn-online-primary w-100"
+              >
+                <i class="fab fa-google me-2"></i>
+                Tiếp tục với Google
+              </button>
+            </form>
+
+            <button
+              class="btn btn-primary w-100 mt-2"
+              onclick="closeGoogleModal()"
+            >
+              Hủy bỏ
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .modal-backdrop-custom {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      backdrop-filter: blur(10px);
+    }
+
+    .modal-custom {
+      background: var(--bg-card);
+      border-radius: 24px;
+      width: 440px;
+      max-width: 90vw;
+      color: var(--text-primary);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+      transform-style: preserve-3d;
+    }
+
+    .modal-custom::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+      border-radius: 20px 20px 0 0;
+    }
+
+    .modal-body {
+      padding: 1rem;
+    }
+
+    .modal-body p {
+      color: var(--text-secondary);
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .modal-actions {
+      padding: 0 2rem 1.5rem;
+    }
+  </style>
+
+  {% endblock %} {% block extra_js %}
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script src="{% static 'js/auth.js' %}"></script>
+  <script src="{% static 'js/register.js' %}"></script>
+  <script>
+    function openGoogleModal(e) {
+      e.preventDefault();
+      const modal = document.getElementById("googleLoginModal");
+      modal.style.display = "flex";
+      // Thêm class sau một khoảng delay nhỏ để kích hoạt animation
+      setTimeout(() => modal.classList.add("show"), 5);
+    }
+
+    function closeGoogleModal() {
+      const modal = document.getElementById("googleLoginModal");
+      modal.classList.remove("show");
+      setTimeout(() => (modal.style.display = "none"), 300);
+    }
+
+    // Đóng modal khi click bên ngoài
+    document
+      .getElementById("googleLoginModal")
+      .addEventListener("click", function (e) {
+        if (e.target === this) {
+          closeGoogleModal();
+        }
+      });
+  </script>
+  {% endblock %}
+</div>

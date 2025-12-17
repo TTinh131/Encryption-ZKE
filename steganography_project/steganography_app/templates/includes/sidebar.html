@@ -1,0 +1,113 @@
+<!-- Sidebar -->
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <a href="/" class="sidebar-brand">
+            <i class="fas fa-shield-alt"></i>
+            <span class="brand-text">SecureMedia</span>
+        </a>
+    </div>
+    <!-- thanh điều hướng -->
+    <ul class="sidebar-nav">
+        <!-- giấu tin -->
+        <li class="nav-section">
+            <div class="section-header" data-bs-toggle="collapse" data-bs-target="#steganographyMenu">
+                <i class="fas fa-eye-slash"></i>
+                <span class="section-text">GIẤU TIN</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </div>
+            <ul class="nav-submenu collapse show" id="steganographyMenu">
+                <li><a href="/hide/" class="submenu-link">
+                    <i class="fas fa-upload"></i>
+                    <span>Giấu Tin Mật</span>
+                </a></li>
+                <li><a href="/extract/" class="submenu-link">
+                    <i class="fas fa-download"></i>
+                    <span>Trích Xuất Tin</span>
+                </a></li>
+            </ul>
+        </li>
+
+        <!-- mã hóa -->
+        <li class="nav-section">
+            <div class="section-header" data-bs-toggle="collapse" data-bs-target="#cryptographyMenu">
+                <i class="fas fa-lock"></i>
+                <span class="section-text">MÃ HÓA</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </div>
+            <ul class="nav-submenu collapse" id="cryptographyMenu">
+                <li><a href="/encrypt/" class="submenu-link">
+                    <i class="fas fa-key"></i>
+                    <span>Mã Hóa File</span>
+                </a></li>
+                <li><a href="/decrypt/" class="submenu-link">
+                    <i class="fas fa-unlock"></i>
+                    <span>Giải Mã File</span>
+                </a></li>
+            </ul>
+        </li>
+
+        <!-- NGƯỜI DÙNG ĐÃ ĐĂNG NHẬP -->
+        {% if user.is_active %}
+        
+
+        <!-- Quản lý -->
+        <li class="nav-section">
+            <div class="section-header" data-bs-toggle="collapse" data-bs-target="#managementMenu">
+                <i class="fas fa-cog"></i>
+                <span class="section-text">QUẢN LÝ</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </div>
+            <ul class="nav-submenu collapse" id="managementMenu">
+                <li><a href="/dashboard/" class="submenu-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Bảng Điều Khiển</span>
+                </a></li>
+                <li><a href="{% url 'profile' %}" class="submenu-link">
+                    <i class="fas fa-user-cog"></i>
+                    <span>Hồ Sơ Cá Nhân</span>
+                </a></li>
+                <li><a href="{% url 'activity_history' %}" class="submenu-link">
+                    <i class="fas fa-history"></i>
+                    <span>Lịch Sử Thao Tác</span>
+                </a></li>
+                <li><a href="{% url 'file_management' %}" class="submenu-link">
+                    <i class="fas fa-folder"></i>
+                    <span>Quản Lý File</span>
+                </a></li>
+            </ul>
+        </li>
+        {% else %}
+        <!-- Đăng nhập/Đăng ký  -->
+        <li class="nav-section">
+            <div class="section-header" data-bs-toggle="collapse" data-bs-target="#authMenu">
+                <i class="fas fa-user"></i>
+                <span class="section-text">TÀI KHOẢN</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </div>
+            <ul class="nav-submenu collapse" id="authMenu">
+                <li><a href="{% url 'login' %}" class="submenu-link">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Đăng Nhập</span>
+                </a></li>
+                <li><a href="{% url 'register' %}" class="submenu-link">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Đăng Ký</span>
+                </a></li>
+            </ul>
+        </li>
+        {% endif %}
+    </ul>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+        {% if user.is_active %}
+        <a href="{% url 'logout' %}" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Đăng Xuất</span>
+        </a>
+        {% endif %}
+        <div class="sidebar-version">
+            <span>v1.0.0</span>
+        </div>
+    </div>
+</nav>

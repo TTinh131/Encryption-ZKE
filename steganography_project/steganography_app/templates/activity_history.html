@@ -1,0 +1,335 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}SecureMedia - Lịch Sử Thao Tác{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/activity_history.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-history">
+        <h1 class="page-title">Lịch Sử Thao Tác</h1>
+        <p>Theo dõi và quản lý tất cả hoạt động của bạn</p>
+    </div>
+
+    <div class="history-actions">
+        <a href="{% url 'export_activity_csv' %}?type={{ filters.activity_type }}&status={{ filters.status }}&date_range={{ filters.date_range }}" 
+            class="btn btn-outline-primary">
+            <i class="fas fa-file-csv me-1"></i> Xuất CSV
+        </a>
+        <a class="btn btn-outline-primary" 
+            href="{% url 'print_activity_log' %}?type={{ request.GET.type }}&status={{ request.GET.status }}&date_range={{ request.GET.date_range }}" 
+            target="_blank">
+            <i class="fas fa-print me-1"></i> In Log
+        </a>
+    </div>
+
+    {% if not user_settings.save_activities %}
+    <div class="warning-alert">
+        <i class="fas fa-exclamation-triangle warning-icon"></i>
+        <div class="warning-content">
+            <h4>Tính năng đang tắt</h4>
+            <p>Ghi log hoạt động đang được tắt trong cài đặt. Các hoạt động mới sẽ không được lưu lại.</p>
+            <a href="{% url 'profile' %}#settings" class="btn btn-outline-primary">
+                <i class="fas fa-cog me-1"></i> Đến cài đặt
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if user_settings.save_activities %}
+    <!-- Thống kê tổng quan -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value" id="stat-total">{{ stats.total|default:0 }}</div>
+            <div class="stat-label">Tổng số</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-success">{{ stats.success|default:0 }}</div>
+            <div class="stat-label">Thành công</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-failed">{{ stats.failed|default:0 }}</div>
+            <div class="stat-label">Thất bại</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-avg-time">{{ stats.avg_time|floatformat:2 }}s</div>
+            <div class="stat-label">Thời gian TB</div>
+        </div>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value" id="stat-encryption">{{ stats.encryption|default:0 }}</div>
+            <div class="stat-label">Mã hóa</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-decryption">{{ stats.decryption|default:0 }}</div>
+            <div class="stat-label">Giải mã</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-hide">{{ stats.hide_data|default:0 }}</div>
+            <div class="stat-label">Giấu tin</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="stat-extract">{{ stats.extract_data|default:0 }}</div>
+            <div class="stat-label">Trích xuất</div>
+        </div>
+    </div>
+
+    <!-- Bộ lọc -->
+    <div class="filters-card">
+        <form method="get" class="filter-row" id="filterForm">
+            <div class="filter-group">
+                <label class="filter-label">Loại thao tác</label>
+                <select class="filter-select" name="type" id="typeFilter">
+                    <option value="">Tất cả</option>
+                    {% for value, label in activity_types %}
+                    <option value="{{ value }}" {% if filters.activity_type == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Trạng thái</label>
+                <select class="filter-select" name="status" id="statusFilter">
+                    <option value="">Tất cả</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Khoảng thời gian</label>
+                <select class="filter-select" name="date_range" id="dateRangeFilter">
+                    <option value="">Tất cả</option>
+                    <option value="today" {% if filters.date_range == 'today' %}selected{% endif %}>Hôm nay</option>
+                    <option value="week" {% if filters.date_range == 'week' %}selected{% endif %}>Tuần này</option>
+                    <option value="month" {% if filters.date_range == 'month' %}selected{% endif %}>Tháng này</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <a href="{% url 'activity_history' %}" class="btn-action" id="resetFilterBtn">
+                    <i class="fas fa-refresh me-1"></i> Đặt lại
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Actions Bar -->
+    <div class="actions-bar" id="actionsBar" style="display: none;">
+        <div class="bulk-actions">
+            <div class="custom-checkbox" id="selectAllCheckbox"></div>
+            <span class="selected-count" id="selectedCount">0 hoạt động được chọn</span>
+        </div>
+        <div class="action-buttons">
+            <button class="btn-action" id="deleteSelectedBtn">
+                <i class="fas fa-trash me-1"></i> Xóa đã chọn
+            </button>
+            <button class="btn-action btn-danger" id="deleteAllBtn">
+                <i class="fas fa-trash-alt me-1"></i> Xóa tất cả
+            </button>
+        </div>
+    </div>
+
+    <!-- Danh sách hoạt động -->
+    <div class="activities-table" id="activitiesTable">
+        <!-- Table Header -->
+        <div class="table-header">
+            <div class="table-cell checkbox-cell"></div>
+            <div class="table-cell index-cell">#</div>
+            <div class="table-cell">Loại thao tác</div>
+            <div class="table-cell">File đầu vào</div>
+            <div class="table-cell">Kích thước</div>
+            <div class="table-cell">Thuật toán</div>
+            <div class="table-cell">Thời gian</div>
+            <div class="table-cell">Thời gian xử lý</div>
+            <div class="table-cell">Trạng thái</div>
+            <div class="table-cell">Hành động</div>
+        </div>
+
+        <!-- Table Body -->
+        {% if activities %}
+            {% for activity in activities %}
+            <div class="table-row" data-activity-id="{{ activity.id }}">
+                <div class="table-cell checkbox-cell">
+                    <div class="activity-checkbox" data-id="{{ activity.id }}"></div>
+                </div>
+                <div class="table-cell index-cell">{{ forloop.counter0|add:activities.start_index }}</div>
+                <div class="table-cell">
+                    {% if activity.activity_type == 'encryption' %}
+                    <div class="activity-type encryption-badge">
+                        <i class="fas fa-lock"></i>
+                        <span>Mã hóa</span>
+                    </div>
+                    {% elif activity.activity_type == 'decryption' %}
+                    <div class="activity-type decryption-badge">
+                        <i class="fas fa-unlock"></i>
+                        <span>Giải mã</span>
+                    </div>
+                    {% elif activity.activity_type == 'hide_data' %}
+                    <div class="activity-type hide-badge">
+                        <i class="fas fa-eye-slash"></i>
+                        <span>Giấu tin</span>
+                    </div>
+                    {% elif activity.activity_type == 'extract_data' %}
+                    <div class="activity-type extract-badge">
+                        <i class="fas fa-search"></i>
+                        <span>Trích xuất</span>
+                    </div>
+                    {% else %}
+                    <div class="activity-type">
+                        <i class="fas fa-cog"></i>
+                        <span>{{ activity.get_activity_type_display }}</span>
+                    </div>
+                    {% endif %}
+            </div>
+            <div class="table-cell file-name-cell">
+                <div class="text-truncate" title="{{ activity.input_filename }}">
+                        {{ activity.input_filename }}
+                </div>
+                    {% if activity.output_filename %}
+                    <div class="text-truncate small text-muted" title="{{ activity.output_filename }}">
+                        → {{ activity.output_filename }}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="table-cell">
+                    {{ activity.file_size|filesizeformat }}
+                </div>
+                <div class="table-cell">
+                    {% if activity.algorithm %}
+                    <span class="algorithm-badge">
+                        {{ activity.algorithm }}
+                    </span>
+                    {% else %}
+                    <span class="text-muted">-</span>
+                    {% endif %}
+                </div>
+                <div class="table-cell">
+                    <small>{{ activity.created_at|date:"d/m/Y H:i" }}</small>
+                </div>
+                <div class="table-cell">
+                    {% if activity.execution_time %}
+                    <span class="time-badge">
+                        {{ activity.execution_time|floatformat:2 }}s
+                    </span>
+                    {% else %}
+                    <span class="text-muted">-</span>
+                    {% endif %}
+                </div>
+                <div class="table-cell">
+                    {% if activity.status == 'success' %}
+                    <span class="status-badge status-success">
+                        <i class="fas fa-check-circle me-1"></i> Thành công
+                    </span>
+                    {% elif activity.status == 'failed' %}
+                    <span class="status-badge status-failed">
+                        <i class="fas fa-times-circle me-1"></i> Thất bại
+                    </span>
+                    {% else %}
+                    <span class="status-badge status-processing">
+                        <i class="fas fa-sync-alt me-1"></i> Đang xử lý
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="table-cell action-buttons">
+                    <button class="btn-icon view-details-btn" data-activity-id="{{ activity.id }}" title="Xem chi tiết">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn-icon delete-activity-btn" data-activity-id="{{ activity.id }}" title="Xóa">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <!-- Empty state -->
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3 class="empty-title">Không có hoạt động nào</h3>
+                <p class="empty-description">
+                    Chưa có hoạt động nào được ghi lại. Hãy bắt đầu sử dụng các tính năng mã hóa, giải mã, giấu tin hoặc trích xuất.
+                </p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <a href="{% url 'encrypt' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-lock me-1"></i> Mã hóa
+                    </a>
+                    <a href="{% url 'hide' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-eye-slash me-1"></i> Giấu tin
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Phân trang -->
+    {% if activities.has_other_pages %}
+    <div class="pagination">
+        {% if activities.has_previous %}
+        <a href="?page={{ activities.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="pagination-btn">
+            <i class="fas fa-chevron-left"></i> Trước
+        </a>
+    {% else %}
+        <span class="pagination-btn disabled">
+            <i class="fas fa-chevron-left"></i> Trước
+        </span>
+    {% endif %}   
+        <span class="pagination-info">
+            Trang {{ activities.number }} / {{ activities.paginator.num_pages }}
+        </span>
+            
+        {% if activities.has_next %}
+        <a href="?page={{ activities.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="pagination-btn">
+                Sau <i class="fas fa-chevron-right"></i>
+        </a>
+        {% else %}
+        <span class="pagination-btn disabled">
+            Sau <i class="fas fa-chevron-right"></i>
+        </span>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% endif %}
+</div>
+
+<!-- Modal chi tiết hoạt động -->
+<div class="modal-overlay" id="activityDetailsModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Chi tiết hoạt động</h3>
+            <button class="modal-close" id="closeModalBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body" id="activityDetailsContent">
+            <!-- Nội dung chi tiết sẽ được tải ở đây -->
+        </div>
+    </div>
+</div>
+{% csrf_token %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/activity_history.js' %}"></script>
+<script>
+let csrfToken = '{{ csrf_token }}';
+document.addEventListener("DOMContentLoaded", function() {
+    // Thêm sự kiện cho bộ lọc để tự động submit khi thay đổi
+    const filterForm = document.getElementById('filterForm');
+    const filterSelects = filterForm.querySelectorAll('.filter-select');
+    
+    filterSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            filterForm.submit();
+        });
+    });
+});
+</script>
+{% endblock %}

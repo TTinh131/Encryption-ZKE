@@ -1,0 +1,558 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}SecureMedia - Hồ Sơ Cá Nhân{% endblock %}
+
+{% block content %}
+<!-- Thông báo hệ thống -->
+{% if messages %}
+<div class="message-container">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show custom-alert" role="alert">
+        {% if message.tags == 'success' %}
+            <i class="fas fa-check-circle me-2"></i>
+        {% elif message.tags == 'error' %}
+            <i class="fas fa-exclamation-circle me-2"></i>
+        {% elif message.tags == 'warning' %}
+            <i class="fas fa-exclamation-triangle me-2"></i>
+        {% else %}
+            <i class="fas fa-info-circle me-2"></i>
+        {% endif %}
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div>
+    <div class="row g-4">
+        <!-- Sidebar Profile -->
+        <div class="col-lg-4">
+            <div class="card profile-card">
+                <div class="card-body text-center">
+                    <div class="avatar-section">
+                        <div class="avatar-wrapper">
+                            <div class="avatar-circle">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="avatar-status {% if user.two_factor_enabled %}online{% else %}offline{% endif %}"></div>
+                        </div>
+                        <h3 class="profile-name">{{ user.username }}</h3>
+                        <p class="meta-label" style="margin: 0; ">{{ user.email }}</p>
+                    </div>
+
+                    <div class="profile-meta">
+                        <div class="meta-item">
+                            <div class="meta-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="meta-content">
+                                <span class="meta-label">Ngày tham gia</span>
+                                <span class="meta-value">{{ user.joined_at|date:"d/m/Y" }}</span>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-icon">
+                                <i class="fas fa-sign-in-alt"></i>
+                            </div>
+                            <div class="meta-content">
+                                <span class="meta-label">Lần đăng nhập cuối</span>
+                                <span class="meta-value">
+                                    {% if user.last_login %}
+                                        {{ user.last_login|date:"d/m/Y H:i" }}
+                                    {% else %}
+                                        Chưa đăng nhập
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="meta-content">
+                                <span class="meta-label">Xác thực 2FA</span>
+                                <span class="meta-status {% if user.two_factor_enabled %}enabled{% else %}disabled{% endif %}">
+                                    {% if user.two_factor_enabled %}Đã bật{% else %}Đã tắt{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-actions-card mt-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"></i>Truy cập nhanh</h6>
+                    </div>
+                    <div class="card-body p-0">
+                            <a href="{% url 'file_management' %}" class="quick-action-item">
+                                <div class="action-icon">
+                                    <i class="fas fa-folder"></i>
+                                </div>
+                                <div class="action-content">
+                                    <span class="action-title">Quản lý file</span>
+                                    <span class="action-desc">File đã mã hóa & ẩn tin</span>
+                                </div>
+                                <div class="action-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </a>
+                            <a href="{% url 'activity_history' %}" class="quick-action-item">
+                                <div class="action-icon">
+                                    <i class="fas fa-history"></i>
+                                </div>
+                                <div class="action-content">
+                                    <span class="action-title">Lịch sử hoạt động</span>
+                                    <span class="action-desc">Nhật ký bảo mật</span>
+                                </div>
+                                <div class="action-arrow">
+                                    <i class="fas fa-chevron-right"></i>
+                                </div>
+                            </a>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <div class="card main-content-card">
+                <div class="card-header profile-tab-header"  style="border-radius: 16px 16px 0 0 !important; margin-bottom: 0;">
+                    <ul class="nav nav-pills" id="profileTabs" role="tablist">
+                        <li class="nav_item" role="presentation">
+                            <button class="nav-link active" id="settings-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#settings" type="button" role="tab">
+                                <i class="fas fa-sliders-h me-2"></i>
+                                <span>Cài Đặt</span>
+                            </button>
+                        </li>
+                        <li class="nav_item" role="presentation">
+                            <button class="nav-link" id="security-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#security" type="button" role="tab">
+                                <i class="fas fa-lock me-2"></i>
+                                <span>Bảo Mật</span>
+                            </button>
+                        </li>
+                        <li class="nav_item" role="presentation">
+                            <button class="nav-link" id="preferences-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#preferences" type="button" role="tab">
+                                <i class="fas fa-palette me-2"></i>
+                                <span>Giao Diện</span>
+                            </button>
+                        </li>
+                        <li class="nav_item" role="presentation">
+                            <button class="nav-link" id="twofactor-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#twofactor" type="button" role="tab">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                <span>2FA</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card-body">
+                    <div class="tab-content" id="profileTabsContent">
+                        <!-- Tab Cài Đặt -->
+                        <div class="tab-pane fade show active" id="settings" role="tabpanel">
+                            <div class="tab-header">
+                                <h5 class="tab-title">Cài Đặt Hệ Thống</h5>
+                                <p class="tab-subtitle">Quản lý cài đặt lưu trữ và bảo mật</p>
+                            </div>
+                            
+                            <form method="post" id="settingsForm" class="settings-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="form_type" value="settings">
+                                
+                                <div class="settings-section">
+                                    <div class="settings-grid">
+                                        <div class="setting-item">
+                                            <div class="setting-header">
+                                                <label class="setting-label">Metadata file</label>
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" type="checkbox" name="save_files" 
+                                                           id="saveFiles" {% if user_settings.save_files %}checked{% endif %}>
+                                                </div>
+                                            </div>
+                                            <p class="setting-description">
+                                                Lưu thông tin file đã mã hóa, giấu tin... (không lưu dữ liệu nhạy cảm)
+                                            </p>
+                                        </div>
+
+                                        <div class="setting-item">
+                                            <div class="setting-header">
+                                                <label class="setting-label">Ghi log hoạt động</label>
+                                                <div class="form-check form-switch">
+                                                    <input class="form-check-input" type="checkbox" name="save_activities" 
+                                                           id="saveActivities" {% if user_settings.save_activities %}checked{% endif %}>
+                                                </div>
+                                            </div>
+                                            <p class="setting-description">
+                                                Ghi lại lịch sử mã hóa, giải mã, giấu tin vào nhật ký
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary btn-lg btn-save">
+                                        <i class="fas fa-save me-2"></i>Lưu cài đặt
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="tab-pane fade" id="security" role="tabpanel">
+    <div class="tab-header">
+        <h5 class="tab-title">Bảo Mật Tài Khoản</h5>
+        <p class="tab-subtitle">Đổi mật khẩu và cập nhật thông tin bảo mật</p>
+    </div>
+    
+    <form method="post" id="passwordForm" class="password-form">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="password">
+        
+        <div class="password-section">
+            <div class="settings-section">
+                <div class="form-group">
+                    <label for="currentPassword" class="meta-label">Mật khẩu hiện tại</label>
+                    <div class="input-group password-input-group">
+                        <input type="password" class="form-control password-input" id="currentPassword" 
+                               name="current_password" required placeholder="Nhập mật khẩu hiện tại">
+                        <button type="button" class="btn btn-outline-secondary password-toggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="newPassword" class="meta-label">Mật khẩu mới</label>
+                    <div class="input-group password-input-group">
+                        <input type="password" class="form-control password-input" id="newPassword" 
+                               name="new_password" required minlength="8" placeholder="Nhập mật khẩu mới">
+                        <button type="button" class="btn btn-outline-secondary password-toggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div id="passwordRequirements" class="requirements-list mt-2">
+                        <div id="reqLength" class="requirement">
+                            <i class="fas fa-times"></i>
+                            <span>Ít nhất 8 ký tự</span>
+                        </div>
+                        <div id="reqLowercase" class="requirement">
+                            <i class="fas fa-times"></i>
+                            <span>Chứa chữ thường (a-z)</span>
+                        </div>
+                        <div id="reqUppercase" class="requirement">
+                            <i class="fas fa-times"></i>
+                            <span>Chứa chữ hoa (A-Z)</span>
+                        </div>
+                        <div id="reqNumber" class="requirement">
+                            <i class="fas fa-times"></i>
+                            <span>Chứa số (0-9)</span>
+                        </div>
+                        <div id="reqSpecial" class="requirement">
+                            <i class="fas fa-times"></i>
+                            <span>Chứa ký tự đặc biệt (!@#$%^&*)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword" class="meta-label">Xác nhận mật khẩu mới</label>
+                    <div class="input-group password-input-group">
+                        <input type="password" class="form-control password-input" id="confirmPassword" 
+                               name="confirm_password" required placeholder="Nhập lại mật khẩu mới">
+                        <button type="button" class="btn btn-outline-secondary password-toggle">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div id="passwordMatchFeedback" class="form-feedback mt-2">
+                        <i class="fas fa-times"></i>
+                        <span>Mật khẩu xác nhận không khớp</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions mt-4">
+                <button type="submit" class="btn btn-primary btn-lg btn-change-password" id="submitBtn" disabled>
+                    <i class="fas fa-key me-2"></i>Đổi mật khẩu
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+                        <!-- Tab Giao Diện -->
+                        <div class="tab-pane fade" id="preferences" role="tabpanel">
+                            <div class="tab-header">
+                                <h5 class="tab-title">Tùy Chỉnh Giao Diện</h5>
+                                <p class="tab-subtitle">Cá nhân hóa trải nghiệm sử dụng</p>
+                            </div>
+                            
+                            <div class="theme-section">
+                                <div class="theme-options">
+                                    <div class="theme-option {% if user.theme == 'dark' %}active{% endif %}" data-theme="dark">
+                                        <div class="theme-card">
+                                            <div class="theme-preview dark-theme">
+                                                <div class="preview-header">
+                                                    <div class="preview-dots">
+                                                        <span class="preview-dot"></span>
+                                                        <span class="preview-dot"></span>
+                                                        <span class="preview-dot"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="preview-content">
+                                                    <div class="preview-sidebar"></div>
+                                                    <div class="preview-main">
+                                                        <div class="preview-line"></div>
+                                                        <div class="preview-line short"></div>
+                                                        <div class="preview-line medium"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="theme-info">
+                                                <div class="theme-icon">
+                                                    <i class="fas fa-moon"></i>
+                                                </div>
+                                                <div class="theme-details">
+                                                    <h6 class="theme-name">Chế độ tối</h6>
+                                                    <p class="theme-desc">Bảo vệ mắt, tiết kiệm pin</p>
+                                                </div>
+                                                <div class="theme-check">
+                                                    <i class="fas fa-check"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="theme-option {% if user.theme == 'light' %}active{% endif %}" data-theme="light">
+                                        <div class="theme-card">
+                                            <div class="theme-preview light-theme">
+                                                <div class="preview-header">
+                                                    <div class="preview-dots">
+                                                        <span class="preview-dot"></span>
+                                                        <span class="preview-dot"></span>
+                                                        <span class="preview-dot"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="preview-content">
+                                                    <div class="preview-sidebar"></div>
+                                                    <div class="preview-main">
+                                                        <div class="preview-line"></div>
+                                                        <div class="preview-line short"></div>
+                                                        <div class="preview-line medium"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="theme-info">
+                                                <div class="theme-icon">
+                                                    <i class="fas fa-sun"></i>
+                                                </div>
+                                                <div class="theme-details">
+                                                    <h6 class="theme-name">Chế độ sáng</h6>
+                                                    <p class="theme-desc">Rõ ràng, chuyên nghiệp</p>
+                                                </div>
+                                                <div class="theme-check">
+                                                    <i class="fas fa-check"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab Xác Thực 2 Yếu Tố -->
+                        
+<div class="tab-pane fade" id="twofactor" role="tabpanel">
+    <div class="tab-header">
+        <h5 class="tab-title">Xác Thực 2 Yếu Tố</h5>
+        <p class="tab-subtitle">Tăng cường bảo mật cho tài khoản của bạn</p>
+    </div>
+    
+    <div class="twofactor-section">
+        <div class="twofactor-card">
+            <div class="twofactor-header">
+                <div class="twofactor-info">
+                    <i class="fas fa-mobile-alt twofactor-icon"></i>
+                    <div>
+                        <h6 class="twofactor-title">Xác thực qua Email</h6>
+                        <p class="twofactor-description">
+                            Bảo vệ tài khoản bằng mã xác thực gửi qua email
+                        </p>
+                    </div>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="two_factor_enabled" 
+                           id="twoFactorToggle" {% if user.two_factor_enabled %}checked{% endif %}
+                           data-current-state="{% if user.two_factor_enabled %}true{% else %}false{% endif %}">
+                </div>
+            </div>
+            
+            <!-- Thêm ID cho các phần cần cập nhật động -->
+            <div id="twoFactorContent">
+                {% if not user.two_factor_enabled %}
+                <div class="twofactor-note">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Khi bật, bạn sẽ nhận được mã OTP qua email để xác nhận</span>
+                </div>
+                {% else %}
+                <div class="twofactor-status">
+                    <div class="status-badge enabled">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <span>Xác thực 2 yếu tố đang hoạt động</span>
+                    </div>
+                    <p class="status-description mt-2">
+                        Tài khoản của bạn được bảo vệ bằng xác thực 2 yếu tố. 
+                        Bạn sẽ nhận được mã OTP qua email khi đăng nhập từ thiết bị mới.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận OTP cho 2FA -->
+<div class="modal fade" id="otpModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    Xác nhận bật 2FA
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="otp-content text-center">
+                    <div class="otp-icon">
+                        <i class="fas fa-envelope fa-3x primary-color"></i>
+                    </div>
+                    <h5>Mã xác thực đã được gửi đến email của bạn</h5>
+                    <p class="meta-label mb-3">Vui lòng nhập mã OTP 6 chữ số để kích hoạt xác thực 2 yếu tố</p>
+                    
+                    <form id="otpForm">
+                        {% csrf_token %}
+                        <div class="otp-input-group mb-4">
+                            <input type="text" 
+                                   class="form-control otp-input text-center" 
+                                   id="otpCode" 
+                                   maxlength="6" 
+                                   minlength="6"
+                                   placeholder=" "
+                                   inputmode="numeric"
+                                   pattern="[0-9]*" 
+                                   autocomplete="off"
+                                   required>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="countdown-timer">
+                                <i class="fas fa-clock me-2"></i>
+                                Gửi lại sau: <span id="countdown"> 60</span> giây
+                            </div>
+                            <button type="button" class="btn btn-link btn-sm p-0" id="resendOtpBtn" disabled>
+                                Gửi lại mã
+                            </button>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="confirmOtpBtn">
+                                Xác nhận
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                Hủy bỏ
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận tắt 2FA -->
+<div class="modal fade" id="disableTwoFactorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2 tprimary-color"></i>
+                    Xác nhận tắt 2FA
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="warning-content">
+                    <div class="warning-icon text-center">
+                        <i class="fas fa-shield-alt fa-3x primary-color"></i>
+                    </div>
+                    <h5>Bạn có chắc chắn muốn tắt xác thực 2 yếu tố?</h5>
+                    <p class="meta-label mb-3">
+                        Tắt xác thực 2 yếu tố sẽ làm giảm mức độ bảo mật của tài khoản. 
+                        Để tiếp tục, vui lòng nhập mật khẩu hiện tại của bạn.
+                    </p>
+                    
+                    <!-- Form nhập mật khẩu -->
+                    <form id="disableTwoFactorForm">
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            <div class="input-group password-input-group">
+                                <input type="password" class="form-control password-input" 
+                                       id="disable2FAPassword" name="current_password" 
+                                       required placeholder="Nhập mật khẩu hiện tại">
+                                <button type="button" class="btn btn-outline-secondary password-toggle">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div id="disable2FAPasswordFeedback" class="form-feedback mt-2" style="display: none;">
+                                <i class="fas fa-times"></i>
+                                <span id="disable2FAPasswordError">Mật khẩu không đúng</span>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="confirmDisableTwoFactorBtn">
+                                Xác nhận tắt 2FA
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                Hủy bỏ
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Thêm các biến JavaScript để tránh lỗi URL -->
+<script>
+    const SEND_OTP_URL = "{% url 'send_otp_api' %}";
+    const TOGGLE_2FA_URL = "{% url 'toggle_two_factor' %}";
+    const PROFILE_URL = "{% url 'profile' %}";
+    const USER_ID = {{ user.id }};
+    const USER_EMAIL = "{{ user.email }}";
+    const USER_THEME = "{{ user.theme|default:'dark' }}";
+    const CSRF_TOKEN = "{{ csrf_token }}";
+    const VERIFY_PASSWORD_2FA_URL = "{% url 'verify_password_2fa' %}";
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/profile.js' %}"></script>
+{% endblock %}

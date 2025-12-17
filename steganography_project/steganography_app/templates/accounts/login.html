@@ -1,0 +1,205 @@
+{% extends 'base.html' %} {% load static %} 
+{% load socialaccount %}
+{% block title %} SecureMedia - Đăng Nhập{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}" />
+<link
+  href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Poppins:wght@300;400;500;600&family=Rajdhani:wght@400;500&display=swap"
+  rel="stylesheet"
+/>
+{% endblock %} {% block content %}
+<!-- Nền -->
+<div id="particles-js"></div>
+
+<!-- Main content -->
+<div class="login-content-wrapper">
+  <div class="container1">
+    <div class="form-box">
+      <h2>ĐĂNG NHẬP</h2>
+      <p>Chào mừng trở lại!</br> Vui lòng đăng nhập để tiếp tục</p>
+      
+      <!-- Login Form -->
+      <form class="login-form" method="post" novalidate autocomplete="off">
+        {% csrf_token %} 
+        <div class="input-group">
+        <input
+            type="text"
+            id="id_username"
+            name="username"
+            required
+            class="input-field"
+            autocomplete="off"
+            value="{{ form.username.value|default_if_none:'' }}"
+        />
+        <label for="id_username">Tên đăng nhập</label>
+        <div class="glow-line"></div>
+  
+        {% if form.username.errors %}
+        <div class="form-feedback invalid">
+            <i class="fas fa-exclamation-circle me-1"></i>
+            {% for error in form.username.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="input-group password-field">
+        <input
+            type="password"
+            id="id_password"
+            name="password"
+            required
+            class="input-field"
+            autocomplete="off"
+        />
+        <label for="id_password">Mật khẩu</label>
+        <!-- Nút hiển thị/ẩn mật khẩu -->
+        <button type="button" class="btn-password-toggle">
+            <i class="fas fa-eye"></i>
+        </button>
+        <div class="glow-line"></div>
+        
+        {% if form.password.errors %}
+        <div class="form-feedback invalid">
+            <i class="fas fa-exclamation-circle me-1"></i>
+            {% for error in form.password.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+        <div class="remember-forgot">
+          <div class="remember">
+            <input type="checkbox" id="rememberMe" name="remember_me" />
+            <label for="rememberMe">Ghi nhớ đăng nhập</label>
+          </div>
+          <a href="{% url 'password_reset' %}" class="forgot">Quên mật khẩu?</a>
+        </div>
+
+        <button type="submit" class="login-btn btn btn-online-primary">
+          <span>ĐĂNG NHẬP</span>
+          <div class="btn-glow"></div>
+        </button>
+        <div class="divider">
+          <span>Hoặc đăng nhập với tài khoản</span>
+        </div>
+        <div class="social-auth">
+          <a href="#" class="btn btn-primary" onclick="openGoogleModal(event)">
+            <i class="fab fa-google"></i>
+            <span>Tiếp tục với Google</span>
+          </a>
+        </div>
+        
+        <div class="signup-link">
+          Chưa có tài khoản? <a href="{% url 'register' %}">Đăng ký ngay</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Modal xác nhận đăng nhập Google -->
+    <div id="googleLoginModal" class="modal-backdrop-custom" style="display: none;">
+      <div class="modal-custom">
+        <div class="form-box">
+          <h2>Đăng nhập bằng Google</h2>
+        </div>
+        
+        <div class="modal-body">
+          <p>Bạn sắp đăng nhập bằng tài khoản Google của mình. Hãy đảm bảo rằng bạn tin tưởng ứng dụng này trước khi tiếp tục.</p>
+          
+          <div class="modal-actions">
+            <form method="post" action="{% provider_login_url 'google' process='login' %}">
+              {% csrf_token %}
+              <button type="submit" class="login-btn btn btn-online-primary w-100">
+                <i class="fab fa-google me-2"></i>
+                Tiếp tục với Google
+              </button>
+            </form>
+
+            <button class="btn btn-primary w-100 mt-2" onclick="closeGoogleModal()">
+              Hủy bỏ
+            </button>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.modal-backdrop-custom {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(10px);
+}
+
+.modal-custom {
+    background: var(--bg-card);
+    border-radius: 24px;
+    width: 440px;
+    max-width: 90vw;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+    transform-style: preserve-3d;
+}
+
+.modal-custom::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-primary);
+    border-radius: 20px 20px 0 0;
+}
+
+.modal-body {
+    padding: 1rem;
+}
+
+.modal-body p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    text-align: center;
+}
+
+.modal-actions {
+    padding: 0 2rem 1.5rem;
+}
+</style>
+
+{% endblock %} {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script src="{% static 'js/auth.js' %}"></script>
+<script>
+function openGoogleModal(e) {
+    e.preventDefault();
+    const modal = document.getElementById('googleLoginModal');
+    modal.style.display = 'flex';
+    // Thêm class sau một khoảng delay nhỏ để kích hoạt animation
+    setTimeout(() => modal.classList.add('show'), 5);
+}
+
+function closeGoogleModal() {
+    const modal = document.getElementById('googleLoginModal');
+    modal.classList.remove('show');
+    setTimeout(() => modal.style.display = 'none', 300);
+}
+
+// Đóng modal khi click bên ngoài
+document.getElementById('googleLoginModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeGoogleModal();
+    }
+});
+</script>
+{% endblock %}

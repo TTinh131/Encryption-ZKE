@@ -1,0 +1,365 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/encrypt.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="encrypt-header">
+    <h4>Giải Mã</h4>
+    <p>Giải mã dữ liệu với Zero-Knowledge Encryption.<br> 
+        Dữ liệu được giải mã ngay trên trình duyệt và không gửi plaintext đến server.</p>
+</div>
+
+<div class="container-fluid">
+    <!-- Thông báo trình duyệt không hỗ trợ -->
+    <div id="browserWarning" class="alert alert-warning d-none">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Trình duyệt của bạn có thể không hỗ trợ đầy đủ:</strong> 
+        Một số tính năng mã hóa nâng cao có thể không hoạt động. 
+        Vui lòng sử dụng Chrome, Firefox, Safari hoặc Edge phiên bản mới nhất.
+    </div>
+
+    <form id="decryptionForm" class="encrypt-form">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-5">
+                <div class="input-section-card">
+                    <h5 class="section-title">Loại giải mã</h5>
+                    <div class="card-options">
+                        <div class="card-option active" data-value="symmetric">
+                            <div class="card-option-icon"><i class="fas fa-exchange-alt"></i></div>
+                            <div class="card-option-text">
+                                <div class="card-option-title">Giải mã đối xứng</div>
+                                <div class="card-option-desc">Sử dụng mật khẩu để giải mã</div>
+                            </div>
+                        </div>
+                        <div class="card-option" data-value="asymmetric" {% if not user.is_authenticated %}data-disabled="true"{% endif %}>
+                            <div class="card-option-icon"><i class="fas fa-user-lock"></i></div>
+                            <div class="card-option-text">
+                                <div class="card-option-title">Giải mã bất đối xứng</div>
+                                <div class="card-option-desc">
+                                    Sử dụng khóa bí mật để giải mã {% if not user.is_authenticated %}(Yêu cầu đăng nhập){% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <select class="form-control d-none" id="encryptionType" name="encryption_type">
+                        <option value="symmetric">Giải mã đối xứng</option>
+                        <option value="asymmetric" {% if not user.is_authenticated %}disabled{% endif %}>
+                            Giải mã bất đối xứng {% if not user.is_authenticated %}(Yêu cầu đăng nhập){% endif %}
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Thuật toán giải mã -->
+            <div class="col-md-7">
+                <div class="input-section-card">
+                    <h5 class="section-title">Thuật toán giải mã</h5>
+                    <div class="card-options">
+                        <div class="card-option active" data-value="AES-256-GCM">
+                            <div class="card-option-icon"><i class="fas fa-shield-alt"></i></div>
+                            <div class="card-option-text">
+                                <div class="card-option-title">AES-256-GCM</div>
+                                <div class="card-option-desc">Giải mã đối xứng mạnh mẽ</div>
+                            </div>
+                        </div>
+                        <div class="card-option" data-value="XChaCha20-Poly1305">
+                            <div class="card-option-icon"><i class="fas fa-bolt"></i></div>
+                            <div class="card-option-text">
+                                <div class="card-option-title">XChaCha20-Poly1305</div>
+                                <div class="card-option-desc">Giải mã dòng hiệu suất cao</div>
+                            </div>
+                        </div>
+                        <div class="card-option" data-value="Ascon128a">
+                            <div class="card-option-icon"><i class="fas fa-microchip"></i></div>
+                            <div class="card-option-text">
+                                <div class="card-option-title">Ascon128a</div>
+                                <div class="card-option-desc">Giải mã nhẹ cho IoT</div>
+                            </div>
+                        </div>
+                    </div>
+                    <select class="form-control d-none" id="algorithm" name="algorithm">
+                        <option value="AES-256-GCM">AES-256-GCM</option>
+                        <option value="XChaCha20-Poly1305">XChaCha20-Poly1305</option>
+                        <option value="Ascon128a">Ascon128a</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-7">
+                <div class="encryption-input-section">
+                    <div class="input-section-card mt-4">
+                        <h5 class="section-title">Loại dữ liệu</h5>
+                        <div class="card-options">
+                            <div class="card-option active" data-value="text">
+                                <div class="card-option-icon">
+                                    <i class="fas fa-font"></i>
+                                </div>
+                                <div class="card-option-text">
+                                    <div class="card-option-title">Văn bản mã hóa</div>
+                                    <div class="card-option-desc">Nhập trực tiếp văn bản mã hóa</div>
+                                </div>
+                            </div>
+                            <div class="card-option" data-value="file">
+                                <div class="card-option-icon">
+                                    <i class="fas fa-file"></i>
+                                </div>
+                                <div class="card-option-text">
+                                    <div class="card-option-title">File mã hóa</div>
+                                    <div class="card-option-desc">Tải lên file để giải mã</div>
+                                </div>
+                            </div>
+                        </div>
+                        <select class="form-control d-none" id="inputType" name="input_type">
+                            <option value="text">Văn bản mã hóa</option>
+                            <option value="file">File mã hóa</option>
+                        </select>
+                    </div>
+
+                    <div class="input-section-card mt-4">
+                        <h5 class="section-title">Dữ liệu cần giải mã</h5>
+                        <div class="form-group" id="textInputGroup">
+                            <label for="inputData" class="form-label">Nội dung cần giải mã</label>
+                            <textarea class="form-control custom-textarea" id="inputData" name="input_data" rows="8" 
+                                      placeholder="Nhập văn bản mã hóa..."></textarea>
+                        </div>
+
+                        <div class="form-group d-none" id="fileInputGroup">
+                            <label class="form-label">Chọn file cần giải mã</label>
+                            <div class="file-drop-zone" id="fileDropArea">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p class="file-text">Kéo & thả file vào đây hoặc <span class="file-link">chọn file</span></p>
+                                <p class="file-text">Hỗ trợ file đến 300MB</p>
+                                <input type="file" class="file-input" id="inputFile" name="file">
+                            </div>
+                            <div id="fileInfo" class="file-info d-none">
+                                <div class="file-name" id="fileName"></div>
+                                <div class="file-size" id="fileSize"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Password group cho giải mã đối xứng -->
+                    <div id="passwordGroup" class="input-section-card mt-4">
+                        <h5 class="section-title">Mật khẩu giải mã</h5>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="password" class="form-control custom-textarea" id="password" name="password" autocomplete="off"
+                                       placeholder="Nhập mật khẩu để giải mã">
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small class="file-text">Nhập mật khẩu bạn đã dùng để mã hóa dữ liệu.</small>
+                        </div>
+                    </div>
+
+                    <!-- Key management cho giải mã bất đối xứng -->
+                    <div id="keyManagement" class="input-section-card mt-4" style="display: none;">
+                        <h5 class="section-title">Quản lý khóa</h5>
+                        <div class="form-group">
+                            <label class="form-label">Chọn khóa bí mật</label>
+                            <select class="form-control" id="privateKeySelect"></select>
+                            <small class="file-text">Chọn khóa bí mật tương ứng với khóa công khai đã dùng để mã hóa</small>
+                        </div>
+                        
+                        <div class="form-group mt-3">
+                            <label for="privateKeyInput" class="form-label">Hoặc nhập khóa bí mật trực tiếp</label>
+                            <textarea class="form-control custom-textarea" id="privateKeyInput" name="private_key_input" rows="3" 
+                                      placeholder="Dán khóa bí mật của bạn ở đây (định dạng Base64)..."></textarea>
+                            <small class="file-text">Dán khóa bí mật nếu không có trong danh sách trên</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cột phải: Thông tin thuật toán và nút hành động -->
+            <div class="col-md-5">
+                <div class="encryption-control-section">
+                    <div class="algorithm-info-card">
+                        <h5 class="section-title">Thông tin thuật toán</h5>
+                        
+                        <div class="algorithm-details" id="algorithmDetails">
+                            <div class="algorithm-detail">
+                                <span class="detail-label">Thuật toán:</span>
+                                <span class="detail-value" id="algoName">AES-256-GCM</span>
+                            </div>
+                            <div class="algorithm-detail">
+                                <span class="detail-label">Loại giải mã:</span>
+                                <span class="detail-value" id="algoType">Đối xứng</span>
+                            </div>
+                            <div class="algorithm-detail">
+                                <span class="detail-label">Yêu cầu:</span>
+                                <span class="detail-value" id="algoRequirement">Mật khẩu</span>
+                            </div>
+                            <div class="algorithm-detail">
+                                <span class="detail-label">Tốc độ:</span>
+                                <span class="detail-value" id="algoSpeed">Nhanh</span>
+                            </div>
+                            <div class="algorithm-detail">
+                                <span class="detail-label">Kích thước khóa:</span>
+                                <span class="detail-value" id="algoKeySize">256 bit</span>
+                            </div>
+                            <div class="algorithm-detail">
+                                <span class="detail-label">Khuyến nghị:</span>
+                                <span class="detail-value" id="algoRecommendation">Sử dụng cho dữ liệu nhạy cảm</span>
+                            </div>
+                        </div>
+                        <div class="algorithm-description mt-3">
+                            <h6 class="mb-2">Mô tả thuật toán</h6>
+                            <p class="file-text" id="algoDescription">
+                                AES-256-GCM là một trong những thuật toán giải mã đối xứng mạnh nhất hiện nay, 
+                                kết hợp giải mã khối AES với 256-bit key và chế độ xác thực GCM.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons mt-4">
+            <button type="button" id="decryptBtn" class="btn-encrypt">
+                Giải Mã
+            </button>
+            <button type="button" id="clearBtn" class="btn btn-outline-secondary">
+                Xóa Hết
+            </button>
+            <a href="{% url 'encrypt' %}" class="btn btn-outline-primary">
+                <i class="fa-solid fa-shuffle"></i>Chuyển sang Mã Hóa
+            </a>
+        </div>
+
+        <div id="resultSection" class="result-section d-none mt-4">
+            <div class="result-header">
+                <i class="fas fa-check-circle"></i>
+                <h5 class="mb-0">Kết quả giải mã</h5>
+            </div>
+            <div class="form-group">
+                <label for="outputData" class="form-label">Dữ liệu đã giải mã</label>
+                <textarea class="form-control custom-textarea" id="outputData" rows="6" readonly 
+                          placeholder="Kết quả giải mã sẽ hiển thị ở đây..."></textarea>
+            </div>
+            <div class="mt-3">
+                <button type="button" id="downloadBtn" class="btn btn-success">
+                    <i class="fas fa-download me-2"></i>Tải về
+                </button>
+                <button type="button" id="copyBtn" class="btn btn-outline-primary">
+                    <i class="fas fa-copy me-2"></i>Sao chép
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div id="loadingSection" class="encrypt-loading d-none">
+        <div class="encrypt-spinner"></div>
+        <p>Đang xử lý giải mã...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Biến toàn cục
+    window.userAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
+    
+    let fileInput, fileNameDisplay, browserWarning, decryptBtn, loginNotice;
+
+    // Hàm khởi tạo
+    function initializeDOMElements() {
+        fileInput = document.getElementById('fileInput');
+        fileNameDisplay = document.getElementById('fileNameDisplay');
+        browserWarning = document.getElementById('browserWarning');
+        decryptBtn = document.getElementById('decryptBtn');
+        loginNotice = document.getElementById('loginNotice');
+    }
+
+    // Hàm kiểm tra Web Crypto API support
+    function checkCryptoSupport() {
+        if (!window.crypto || !window.crypto.subtle) {
+            if (browserWarning) browserWarning.classList.remove('d-none');
+            if (decryptBtn) decryptBtn.disabled = true;
+            console.warn('Web Crypto API không được hỗ trợ trong trình duyệt này');
+            return false;
+        }
+        return true;
+    }
+
+    // Hàm kiểm tra trạng thái đăng nhập
+    function checkAuthenticationStatus() {
+        if (!window.userAuthenticated && loginNotice) {
+            loginNotice.classList.remove('d-none');
+        }
+    }
+
+    // Hàm xử lý sự kiện thay đổi file
+    function handleFileChange() {
+        if (!fileInput) return;
+        
+        fileInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                updateFileNameDisplay(this.files[0].name);
+                fileNameDisplay.style.display = 'block';
+            } else {
+                fileNameDisplay.style.display = 'none';
+            }
+        });
+    }
+
+    // Hàm cập nhật hiển thị tên file
+    function updateFileNameDisplay(fileName) {
+        if (!fileNameDisplay) return;
+        
+        const nameElement = fileNameDisplay.querySelector('.file-name-text');
+        if (nameElement) {
+            nameElement.textContent = fileName;
+        }
+    }
+
+    // Hàm kiểm tra và hiển thị file đã chọn từ trước
+    function checkPreSelectedFile() {
+        if (fileInput && fileInput.files && fileInput.files.length > 0) {
+            updateFileNameDisplay(fileInput.files[0].name);
+            if (fileNameDisplay) {
+                fileNameDisplay.style.display = 'block';
+            }
+        }
+    }
+
+    // Hàm kiểm tra auto-fill
+    function checkAutoFill() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoFill = urlParams.get('auto_fill');
+        
+        if (autoFill === 'true') {
+            // Có thể thêm xử lý đặc biệt cho auto-fill ở đây
+        }
+    }
+
+    function initializeApp() {
+        initializeDOMElements();
+        checkCryptoSupport();
+        checkAuthenticationStatus();
+        handleFileChange();
+        checkPreSelectedFile();
+        checkAutoFill();
+    }
+
+    document.addEventListener("DOMContentLoaded", initializeApp);
+</script>
+<script src="{% static 'js/auto_fill.js' %}"></script>
+<script src="{% static 'js/crypto/aes256gcm.js' %}"></script>
+<script src="{% static 'js/crypto/xchacha20.js' %}"></script>
+<script src="{% static 'js/crypto/ascon128a.js' %}"></script>
+<script src="{% static 'js/crypto/x25519.js' %}"></script>
+<script src="{% static 'js/crypto/kyber1024.js' %}"></script>
+<script src="{% static 'js/zke_crypto.js' %}"></script>
+<script src="{% static 'js/decryption.js' %}"></script>
+<script src="{% static 'js/encrypt_ui.js' %}"></script>
+{% endblock %}

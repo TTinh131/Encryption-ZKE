@@ -1,0 +1,428 @@
+/* Reset các style từ auth.css có thể ảnh hưởng  */
+.dashboard-container * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Container chính của Dashboard */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: calc(100vh - 120px);
+    position: relative;
+    z-index: 1;
+}
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding: 0;
+}
+
+.welcome-section .hero-subtitle {
+    max-width: 100%;
+}
+
+.dashboard-main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/*Top Section - Quản lý và Activity */
+.dashboard-top-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    min-height: 380px;
+    align-items: stretch;
+}
+
+/* Phần quản lý hệ thống với các card chức năng */
+.management-section {
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.management-section .section-title {
+    font-size: 1.6rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.management-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    height: 100%;
+}
+
+/* Card quản lý cá nhân (Hồ sơ, Lịch sử, File, Khóa, 2FA) */
+.management-card {
+    display: flex;
+    align-items: center;
+    background: var(--bg-card);
+    padding: 1.2rem 1.5rem;
+    border-radius: 14px;
+    border: 1px solid var(--border-light);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.management-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(var(--primary-color-rgb), 0.1), transparent);
+    transition: left 0.6s;
+}
+
+.management-card:hover::before {
+    left: 100%;
+}
+
+.management-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(var(--primary-color-rgb), 0.15);
+}
+
+/* Icon với gradient màu khác nhau cho từng chức năng */
+.management-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-right: 1.2rem;
+    color: white;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.management-card:hover .management-icon {
+    transform: scale(1.1);
+}
+
+/* Màu gradient cho từng icon chức năng */
+.management-icon.profile { background: linear-gradient(135deg, #667eea, #764ba2); }
+.management-icon.history { background: linear-gradient(135deg, #f093fb, #f5576c); }
+.management-icon.files { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+.management-icon.keys { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+.management-icon.twofa { background: linear-gradient(135deg, #fa709a, #fee140); }
+
+/* Thông tin trong card quản lý */
+.management-info {
+    flex: 1;
+}
+
+.management-info h3 {
+    margin: 0 0 0.3rem 0;
+    font-size: 1.15rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.management-info p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Mũi tên điều hướng */
+.management-arrow {
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    font-size: 1rem;
+}
+
+.management-card:hover .management-arrow {
+    transform: translateX(5px);
+    color: var(--primary-color);
+}
+
+/* Badge trạng thái (Bật/Tắt cho 2FA) */
+.management-status {
+    padding: 0.4rem 0.8rem;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: 0.8rem;
+    flex-shrink: 0;
+    border: 1px solid;
+}
+
+.management-status.enabled {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.management-status.disabled {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Phần hiển thị hoạt động gần đây */
+.activity-section {
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.activity-section .section-title {
+    font-size: 1.6rem;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* Nút "Xem tất cả" */
+.view-all {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--primary-color);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    background: transparent;
+}
+
+.view-all:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(var(--primary-color-rgb), 0.3);
+}
+
+/* Danh sách hoạt động với scroll */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    background: var(--bg-card);
+    padding: 1rem 1.2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+    gap: 1rem;
+    transition: all 0.3s ease;
+}
+
+.activity-item:hover {
+    transform: translateX(5px);
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Icon hoạt động với màu theo trạng thái */
+.activity-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+/* Màu sắc cho các loại hoạt động */
+.activity-icon.success { background: rgba(34, 197, 94, 0.1); color: #16a34a; border: 1px solid rgba(34, 197, 94, 0.2); }
+.activity-icon.warning { background: rgba(245, 158, 11, 0.1); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.2); }
+.activity-icon.info { background: rgba(59, 130, 246, 0.1); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.2); }
+.activity-icon.error { background: rgba(239, 68, 68, 0.1); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.2); }
+
+/* Chi tiết hoạt động */
+.activity-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.activity-desc {
+    margin: 0 0 0.3rem 0;
+    font-weight: 500;
+    font-size: 0.92rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.activity-time {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+/* Badge trạng thái hoạt động */
+.activity-badge {
+    padding: 0.3rem 0.7rem;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex-shrink: 0;
+    border: 1px solid;
+}
+
+.activity-badge.success { background: rgba(34, 197, 94, 0.1); color: #16a34a; border-color: rgba(34, 197, 94, 0.2); }
+.activity-badge.failed { background: rgba(239, 68, 68, 0.1); color: #dc2626; border-color: rgba(239, 68, 68, 0.2); }
+
+/* Trạng thái khi không có dữ liệu */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+    color: var(--text-secondary);
+    flex: 1;
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.4;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 1rem;
+    opacity: 0.7;
+}
+
+/* Phần công cụ bảo mật (6 công cụ chính) */
+.tools-section .section-title {
+    font-size: 1.8rem;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.tools-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.2rem;
+}
+
+/* Card công cụ bảo mật */
+.tool-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background: var(--bg-secondary);
+    padding: 1.8rem 1.2rem;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.tool-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.tool-card:hover::before {
+    transform: scaleX(1);
+}
+
+.tool-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-color);
+    box-shadow: 0 8px 25px rgba(var(--primary-color-rgb), 0.15);
+}
+
+/* Icon công cụ với gradient */
+.tool-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: white;
+    transition: transform 0.3s ease;
+}
+
+.tool-card:hover .tool-icon {
+    transform: scale(1.05) rotate(3deg);
+}
+
+/* Màu gradient cho từng công cụ */
+.tool-icon.hide { background: linear-gradient(135deg, #667eea, #764ba2); }
+.tool-icon.extract { background: linear-gradient(135deg, #f093fb, #f5576c); }
+.tool-icon.encrypt { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+.tool-icon.decrypt { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+.tool-icon.detect { background: linear-gradient(135deg, #fa709a, #fee140); }
+.tool-icon.signature { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+
+/* Màu gradient cho từng công cụ */
+.tool-card h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.tool-card p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    opacity: 0.8;
+    line-height: 1.4;
+}
+

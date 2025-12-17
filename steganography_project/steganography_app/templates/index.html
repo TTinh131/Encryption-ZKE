@@ -1,0 +1,301 @@
+{% extends 'base.html' %} {% load static %} {% block title%}SecureMedia{%endblock %} {% block content %}
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center min-vh-60 py-4">
+      <div class="col-lg-6">
+        <h1 class="hero-title mb-3">
+          Bảo Mật Dữ Liệu <br />& Phân Tích Tin Ẩn
+        </h1>
+        <p class="hero-subtitle mb-4">
+          Hệ thống Web toàn diện cho giấu tin, mã hóa và phát hiện dữ liệu ẩn
+          trong các tệp đa phương tiện. Bảo vệ thông tin của bạn với công nghệ
+          Zero-Knowledge.
+        </p>
+
+        <div class="hero-buttons">
+          {% if user.is_active %}
+          <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-tachometer-alt me-2"></i>Bảng Điều Khiển
+          </a>
+          <a href="{% url 'hide' %}" class="btn btn-outline-primary btn-lg">
+            <i class="fas fa-play me-2"></i>Bắt Đầu Làm Việc
+          </a>
+          {% else %}
+          <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-user-plus me-2"></i>Bắt Đầu Ngay
+          </a>
+          <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">
+            <i class="fas fa-sign-in-alt me-2"></i>Đăng Nhập
+          </a>
+          {% endif %}
+        </div>
+
+        <div class="security-badges">
+          <span class="security-badge active" data-tab="aes">
+            <i class="fas fa-shield-alt me-1"></i>Mã hóa AES-256-GCM
+          </span>
+          <span class="security-badge" data-tab="zero">
+            <i class="fas fa-user-secret me-1"></i>Zero-Knowledge
+          </span>
+          <span class="security-badge" data-tab="client">
+            <i class="fas fa-bolt me-1"></i>Xử lý phía khách hàng
+          </span>
+        </div>
+      </div>
+
+      <div class="col-lg-6 text-center">
+        <div class="hero-visual">
+          <div class="floating-element"></div>
+          <div class="floating-element"></div>
+          <div class="floating-element"></div>
+          <div class="encryption-cards-container">
+            <div class="encryption-card-content active" id="aes-card">
+              <div class="encryption-card-mini">
+                <div class="card-header-mini">
+                  <i class="fas fa-lock"></i>
+                  <span>Mã hóa AES-256-GCM</span>
+                </div>
+                <div class="algorithm-info-mini">
+                  <div class="info-row-mini">
+                    <span class="label-mini">Thuật toán:</span>
+                    <span class="value-mini">AES-GCM</span>
+                  </div>
+                  <div class="info-row-mini">
+                    <span class="label-mini">Kích thước khóa:</span>
+                    <span class="value-mini">256 bits</span>
+                  </div>
+                  <div class="info-row-mini">
+                    <span class="label-mini">Mode:</span>
+                    <span class="value-mini">Confidentiality</span>
+                  </div>
+                </div>
+                <div class="encryption-status-mini">
+                  <div class="status-indicator-mini"></div>
+                  <span>Mã hóa ngay</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="encryption-card-content" id="zero-card">
+              <div class="encryption-card-mini">
+                <div class="card-header-mini">
+                  <i class="fas fa-user-secret"></i>
+                  <span>Công nghệ Zero-Knowledge</span>
+                </div>
+                <div class="algorithm-info-mini">
+                  <div class="info-row-mini">
+                    <span class="label-mini">Bảo mật:</span>
+                    <span class="value-mini">Tuyệt đối</span>
+                  </div>
+                  <div class="info-row-mini">
+                    <span class="label-mini">Quyền riêng tư:</span>
+                    <span class="value-mini">100%</span>
+                  </div>
+                  <div class="info-row-mini">
+                    <span class="label-mini">Truy cập server:</span>
+                    <span class="value-mini">Không có</span>
+                  </div>
+                </div>
+                <div class="encryption-status-mini">
+                  <div class="status-indicator-mini"></div>
+                  <span>Bảo mật tối đa</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="encryption-card-content" id="client-card">
+              <div class="encryption-card-mini">
+                <div class="card-header-mini">
+                  <i class="fas fa-bolt"></i>
+                  <span>Xử lý phía khách hàng</span>
+                </div>
+                <div class="algorithm-info-mini">
+                  <div class="info-row-mini">
+                    <span class="label-mini">Tốc độ:</span>
+                    <span class="value-mini">Cao</span>
+                  </div>
+                  <div class="info-row-mini">
+                    <span class="label-mini">Băng thông:</span>
+                    <span class="value-mini">Tiết kiệm</span>
+                  </div>
+                  <div class="info-row-mini">
+                    <span class="label-mini">Xử lý:</span>
+                    <span class="value-mini">Real-time</span>
+                  </div>
+                </div>
+                <div class="encryption-status-mini">
+                  <div class="status-indicator-mini"></div>
+                  <span>Hiệu suất tối ưu</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features-section py-4">
+  <div class="container">
+    <h2 class="section-title text-center mb-4">Công Cụ Bảo Mật Mạnh Mẽ</h2>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-eye-slash"></i>
+          </div>
+          <h4>Giấu Tin Nâng Cao</h4>
+          <p>
+            Ẩn thông tin mật trong hình ảnh, âm thanh, video với các thuật toán
+            LSB, DCT, DWT.
+          </p>
+          <div class="feature-meta">
+            <span class="badge">LSB • DCT • DWT</span>
+          </div>
+          <a href="{% url 'hide' %}" class="btn btn-primary btn-sm mt-3">
+            <i class="fas fa-play me-2"></i>Khám Phá
+          </a>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-lock"></i>
+          </div>
+          <h4>Mã Hóa Zero-Knowledge</h4>
+          <p>
+            Mã hóa và giải mã với AES-256-GCM, XChaCha20-Poly1305,... Dữ liệu mã
+            hóa hoàn toàn trên client.
+          </p>
+          <div class="feature-meta">
+            <span class="badge">AES-256 • XChaCha20</span>
+          </div>
+          <a href="{% url 'encrypt' %}" class="btn btn-primary btn-sm mt-3">
+            <i class="fas fa-play me-2"></i>Khám Phá
+          </a>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-file-shield"></i>
+          </div>
+          <h4>Quản Lý File An Toàn</h4>
+          <p>
+            Lưu trữ và quản lý file đã mã hóa với hệ thống phân quyền và bảo mật
+            nhiều lớp.
+          </p>
+          <div class="feature-meta">
+            <span class="badge">Secure Storage</span>
+          </div>
+          <a href="{% url 'dashboard' %}" class="btn btn-primary btn-sm mt-3">
+            <i class="fas fa-play me-2"></i>Khám Phá
+          </a>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-layer-group"></i>
+          </div>
+          <h4>Bảo Mật Đa Lớp</h4>
+          <p>
+            Kết hợp nhiều lớp bảo mật: mã hóa → giấu tin → ký số cho bảo vệ toàn
+            diện.
+          </p>
+          <div class="feature-meta">
+            <span class="badge">Multi-layer</span>
+          </div>
+          <a href="#" class="btn btn-primary btn-sm mt-3">
+            <i class="fas fa-play me-2"></i>Khám Phá
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-4">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h2 class="section-title mb-3">Zero-Knowledge Encryption</h2>
+        <p class="security-description mb-4">
+          Dữ liệu của bạn được mã hóa hoàn toàn trên trình duyệt trước khi gửi
+          đến server. Chúng tôi không bao giờ có quyền truy cập vào khóa giải mã
+          hoặc nội dung gốc của bạn.
+        </p>
+
+        <div class="security-features">
+          <div class="security-item">
+            <i class="fa-solid fa-user-shield"></i>
+            <div>
+              <h5>Bảo Mật Tuyệt Đối</h5>
+              <p>Khóa mã hóa chỉ tồn tại trên thiết bị của bạn</p>
+            </div>
+          </div>
+
+          <div class="security-item">
+            <i class="fas fa-user-secret"></i>
+            <div>
+              <h5>Quyền Riêng Tư Tối Đa</h5>
+              <p>Server không thể đọc hoặc truy cập dữ liệu của bạn</p>
+            </div>
+          </div>
+
+          <div class="security-item">
+            <i class="fas fa-bolt"></i>
+            <div>
+              <h5>Hiệu Suất Cao</h5>
+              <p>Xử lý nhanh chóng ngay trên trình duyệt</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="security-visual">
+          <div class="encryption-process">
+            <div class="process-step">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <h6>Tải Lên File</h6>
+                <p>File được tải lên trình duyệt một cách an toàn</p>
+              </div>
+            </div>
+
+            <div class="process-step">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <h6>Mã Hóa Client-side</h6>
+                <p>File được mã hóa hoàn toàn trên trình duyệt của bạn</p>
+              </div>
+            </div>
+
+            <div class="process-step">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <h6>Gửi Đến Server</h6>
+                <p>Chỉ dữ liệu đã mã hóa được gửi đi</p>
+              </div>
+            </div>
+
+            <div class="process-step">
+              <div class="step-number">4</div>
+              <div class="step-content">
+                <h6>Lưu Trữ An Toàn</h6>
+                <p>Dữ liệu mã hóa được lưu trữ bảo mật</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

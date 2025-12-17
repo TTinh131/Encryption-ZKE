@@ -1,0 +1,409 @@
+{% extends 'base.html' %} {% load static %} {% block title %}SecureMedia - Điều
+Khoản Dịch Vụ{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auth.css' %}" />
+<link rel="stylesheet" href="{% static 'css/terms.css' %}" />
+{% endblock %} {% block content %}
+<div class="terms-header">
+  <h1 class="terms-title">ĐIỀU KHOẢN DỊCH VỤ</h1>
+  <p class="terms-subtitle">
+    Kết hợp quy định pháp luật Việt Nam và chính sách riêng của SecureMedia
+  </p>
+</div>
+
+<div class="terms-nav">
+  <a class="nav-item active" data-section="all">
+    <i class="fas fa-home nav-icon"></i>
+    <span class="nav-text">Trang Chủ</span>
+  </a>
+  <a class="nav-item" data-section="introduction">
+    <i class="fas fa-info-circle nav-icon"></i>
+    <span class="nav-text">Giới Thiệu</span>
+  </a>
+  <a class="nav-item" data-section="legal-framework">
+    <i class="fas fa-gavel nav-icon"></i>
+    <span class="nav-text">Khung Pháp Lý</span>
+  </a>
+  <a class="nav-item" data-section="prohibited-acts">
+    <i class="fas fa-ban nav-icon"></i>
+    <span class="nav-text">Hành Vi Cấm</span>
+  </a>
+  <a class="nav-item" data-section="user-rights">
+    <i class="fas fa-user-shield nav-icon"></i>
+    <span class="nav-text">Quyền Người Dùng</span>
+  </a>
+  <a class="nav-item" data-section="data-security">
+    <i class="fas fa-lock nav-icon"></i>
+    <span class="nav-text">Bảo Mật DL</span>
+  </a>
+  <a class="nav-item" data-section="service-policy">
+    <i class="fas fa-cog nav-icon"></i>
+    <span class="nav-text">Chính Sách DV</span>
+  </a>
+  <a class="nav-item" data-section="contact">
+    <i class="fas fa-headset nav-icon"></i>
+    <span class="nav-text">Liên Hệ</span>
+  </a>
+</div>
+
+<div class="terms-content full-content" id="terms-content">
+  <div class="content-section" id="introduction-section">
+    <div class="section-header">
+      <h2 class="section-title">Giới Thiệu</h2>
+    </div>
+    <div class="section-content">
+      <div class="content-item">
+        <h3 class="item-title">
+          <i class="fas fa-check-circle"></i>
+          Cam Kết Kép: Pháp Luật & Người Dùng
+        </h3>
+        <p>
+          SecureMedia hoạt động với cam kết kép: tuân thủ nghiêm ngặt pháp luật
+          Việt Nam và bảo vệ tối đa quyền lợi người dùng.
+        </p>
+        <div class="policy-badge">
+          <span>THEO QUY ĐỊNH PHÁP LUẬT</span>
+        </div>
+        <ul>
+          <li>Tuân thủ Luật An ninh mạng số 24/2018/QH14</li>
+          <li>Tuân thủ Luật An toàn thông tin mạng số 86/2015/QH13</li>
+          <li>Tuân thủ Nghị định 53/2022/NĐ-CP về bảo vệ dữ liệu cá nhân</li>
+        </ul>
+        <div
+          class="policy-badge"
+          style="
+            background: rgba(46, 204, 113, 0.1);
+            border-color: rgba(46, 204, 113, 0.3);
+            color: #27ae60;
+          "
+        >
+          <span>CHÍNH SÁCH SECUREMEDIA</span>
+        </div>
+        <ul>
+          <li>Không đọc nội dung file của người dùng</li>
+          <li>Mã hóa end-to-end cho tất cả dữ liệu</li>
+          <li>Quyền xóa dữ liệu hoàn toàn khi người dùng yêu cầu</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-section" id="legal-framework-section">
+    <div class="section-header">
+      <h2 class="section-title">Khung Pháp Lý</h2>
+    </div>
+    <div class="section-content">
+      <div class="legal-document">
+        <div class="legal-header">
+          <h3 class="legal-title">Luật An ninh mạng 2018</h3>
+          <p class="legal-meta">
+            Luật số 24/2018/QH14 - Có hiệu lực từ 01/01/2019
+          </p>
+        </div>
+        <div class="legal-content">
+          <div class="legal-article">
+            <h4 class="article-title">
+              <i class="fas fa-article"></i>
+              Điều 8. Hành vi bị nghiêm cấm
+            </h4>
+            <div class="article-content">
+              <p>Các hành vi bị nghiêm cấm về an ninh mạng:</p>
+              <ul>
+                <li>Chống phá Nhà nước Cộng hòa xã hội chủ nghĩa Việt Nam</li>
+                <li>Xâm phạm quyền và lợi ích hợp pháp của tổ chức, cá nhân</li>
+                <li>Tấn công mạng, khủng bố mạng, gián điệp mạng</li>
+                <li>Chiếm quyền điều khiển, xâm nhập hệ thống thông tin</li>
+              </ul>
+            </div>
+          </div>
+          <div class="legal-article">
+            <h4 class="article-title">
+              Điều 26. Trách nhiệm bảo vệ an ninh mạng
+            </h4>
+            <div class="article-content">
+              <p>SecureMedia thực hiện các biện pháp bảo vệ an ninh mạng:</p>
+              <ul>
+                <li>Kiểm tra, giám sát an ninh mạng thường xuyên</li>
+                <li>Ứng phó, khắc phục sự cố an ninh mạng</li>
+                <li>Phòng, chống tấn công mạng</li>
+                <li>Bảo vệ thông tin cá nhân trên mạng</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="content-alert">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div>
+          <strong>Chính sách của SecureMedia:</strong> Chúng tôi cam kết thực
+          hiện đầy đủ các quy định của Luật An ninh mạng, đồng thời áp dụng các
+          biện pháp bảo mật tiên tiến vượt chuẩn để bảo vệ người dùng.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-section" id="prohibited-acts-section">
+    <div class="section-header">
+      <h2 class="section-title">Hành Vi Bị Nghiêm Cấm</h2>
+    </div>
+    <div class="section-content">
+      <div class="content-item">
+        <h3 class="item-title">
+          <i class="fas fa-exclamation-triangle"></i>
+          Hành vi bị nghiêm cấm theo pháp luật
+        </h3>
+        <p>
+          Theo Điều 8 Luật An ninh mạng 2018 và Điều 7 Luật An toàn thông tin
+          mạng 2015:
+        </p>
+        <ul>
+          <li>
+            Tổ chức, hoạt động, cấu kết, xúi giục, mua chuộc, lừa gạt, lôi kéo,
+            đào tạo, huấn luyện người chống Nhà nước
+          </li>
+          <li>
+            Thông tin sai sự thật gây hoang mang trong Nhân dân, gây thiệt hại
+            cho hoạt động kinh tế - xã hội
+          </li>
+          <li>Xâm phạm trật tự quản lý kinh tế</li>
+          <li>Hoạt động mại dâm, tệ nạn xã hội, mua bán người</li>
+          <li>
+            Xuyên tạc lịch sử, phủ nhận thành tựu cách mạng, phá hoại khối đại
+            đoàn kết toàn dân tộc
+          </li>
+        </ul>
+      </div>
+      <div class="content-item">
+        <h3 class="item-title">
+          <i class="fas fa-user-slash"></i>
+          Hành vi bị nghiêm cấm theo chính sách SecureMedia
+        </h3>
+        <p>
+          Ngoài các hành vi bị pháp luật nghiêm cấm, SecureMedia cấm các hành vi
+          sau:
+        </p>
+        <ul>
+          <li>Khai thác lỗ hổng bảo mật của hệ thống</li>
+          <li>Spam, gửi thông tin quảng cáo trái phép</li>
+          <li>Sử dụng dịch vụ cho mục đích bất hợp pháp</li>
+          <li>Chia sẻ thông tin giả mạo, độc hại</li>
+          <li>Vi phạm bản quyền và sở hữu trí tuệ</li>
+        </ul>
+      </div>
+      <div class="content-alert">
+        <i class="fas fa-gavel"></i>
+        <div>
+          <strong>Xử lý vi phạm:</strong> Mọi hành vi vi phạm sẽ bị xử lý theo
+          quy định pháp luật và chính sách của SecureMedia, bao gồm cả việc chấm
+          dứt dịch vụ và phối hợp với cơ quan chức năng khi cần thiết.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-section" id="user-rights-section">
+    <div class="section-header">
+      <h2 class="section-title">Quyền Của Người Dùng</h2>
+    </div>
+    <div class="section-content">
+      <div class="content-item">
+        <h3 class="item-title">
+          <i class="fas fa-shield-alt"></i>
+          Quyền theo Luật Bảo vệ dữ liệu cá nhân
+        </h3>
+        <p>Theo Nghị định 53/2022/NĐ-CP, người dùng có các quyền sau:</p>
+        <ul>
+          <li>Quyền được biết về việc xử lý dữ liệu cá nhân</li>
+          <li>Quyền đồng ý hoặc không đồng ý cho xử lý dữ liệu cá nhân</li>
+          <li>Quyền truy cập dữ liệu cá nhân</li>
+          <li>Quyền sửa đổi, bổ sung dữ liệu cá nhân</li>
+          <li>Quyền xóa, hủy dữ liệu cá nhân</li>
+          <li>Quyền hạn chế xử lý dữ liệu cá nhân</li>
+        </ul>
+      </div>
+      <div class="content-item">
+        <h3 class="item-title">
+          <i class="fas fa-hand-holding-heart"></i>
+          Quyền theo chính sách SecureMedia
+        </h3>
+        <p>SecureMedia cam kết bảo vệ các quyền sau cho người dùng:</p>
+        <ul>
+          <li>
+            <strong>Quyền riêng tư tuyệt đối:</strong> Chúng tôi không đọc nội
+            dung file của bạn
+          </li>
+          <li>
+            <strong>Quyền mã hóa:</strong> Tất cả dữ liệu được mã hóa end-to-end
+          </li>
+          <li>
+            <strong>Quyền xóa hoàn toàn:</strong> Bạn có thể xóa vĩnh viễn dữ
+            liệu bất kỳ lúc nào
+          </li>
+          <li>
+            <strong>Quyền minh bạch:</strong> Chúng tôi công khai cách thức xử
+            lý dữ liệu
+          </li>
+          <li>
+            <strong>Quyền khiếu nại:</strong> Cơ chế giải quyết khiếu nại rõ
+            ràng, minh bạch
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-section" id="data-security-section">
+    <div class="section-header">
+      <h2 class="section-title">Bảo Mật Dữ Liệu</h2>
+    </div>
+    <div class="section-content">
+      <div class="content-item">
+        <h3 class="item-title">
+          <i class="fas fa-database"></i>
+          Nguyên tắc bảo mật theo pháp luật
+        </h3>
+        <p>Theo Luật An toàn thông tin mạng và Nghị định 53/2022/NĐ-CP:</p>
+        <ul>
+          <li>Thu thập dữ liệu hợp pháp, minh bạch</li>
+          <li>Mục đích xử lý rõ ràng, cụ thể</li>
+          <li>Giới hạn phạm vi sử dụng dữ liệu</li>
+          <li>Bảo đảm an toàn, bảo mật dữ liệu</li>
+          <li>Tôn trọng quyền riêng tư của cá nhân</li>
+        </ul>
+      </div>
+      <div class="content-item">
+        <h3 class="item-title">
+          <i class="fas fa-user-shield"></i>
+          Chính sách bảo mật của SecureMedia
+        </h3>
+        <ul>
+          <li>
+            <strong>Mã hóa toàn bộ:</strong> Tất cả dữ liệu trên hệ thống khi
+            truyền tải hay lưu trữ đều được mã hóa
+          </li>
+          <li>
+            <strong>Không đọc nội dung:</strong> Chúng tôi không truy cập nội
+            dung file của bạn
+          </li>
+          <li>
+            <strong>Bảo mật vật lý:</strong> Hệ thống server đặt tại trung tâm
+            dữ liệu đạt chuẩn quốc tế
+          </li>
+          <li>
+            <strong>Giám sát 24/7:</strong> Hệ thống giám sát an ninh hoạt động
+            liên tục
+          </li>
+          <li>
+            <strong>Backup an toàn:</strong> Sao lưu dữ liệu định kỳ và mã hóa
+          </li>
+        </ul>
+      </div>
+      <div class="content-alert">
+        <i class="fas fa-star"></i>
+        <div>
+          <strong>Cam kết vượt chuẩn:</strong> SecureMedia áp dụng các tiêu
+          chuẩn bảo mật cao hơn yêu cầu pháp luật để đảm bảo an toàn tuyệt đối
+          cho dữ liệu người dùng.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-section" id="service-policy-section">
+    <div class="section-header">
+      <h2 class="section-title">Chính Sách Dịch Vụ</h2>
+    </div>
+    <div class="section-content">
+      <div class="content-item">
+        <h3 class="item-title">
+          <i class="fas fa-sync-alt"></i>
+          Cập nhật và thay đổi
+        </h3>
+        <p>
+          <strong>Theo pháp luật:</strong> Tuân thủ các quy định về thông báo
+          thay đổi điều khoản dịch vụ.
+        </p>
+        <p><strong>Chính sách SecureMedia:</strong></p>
+        <ul>
+          <li>Thông báo trước 30 ngày cho các thay đổi quan trọng</li>
+          <li>Cho phép người dùng phản hồi về thay đổi</li>
+          <li>Duy trì phiên bản cũ cho người dùng không đồng ý với thay đổi</li>
+        </ul>
+      </div>
+      <div class="content-item">
+        <h3 class="item-title">
+          <i class="fas fa-handshake"></i>
+          Trách nhiệm và giới hạn
+        </h3>
+        <p>
+          <strong>Theo pháp luật:</strong> Tuân thủ các quy định về trách nhiệm
+          pháp lý của nhà cung cấp dịch vụ.
+        </p>
+        <p><strong>Cam kết SecureMedia:</strong></p>
+        <ul>
+          <li>Chịu trách nhiệm về lỗi hệ thống từ phía chúng tôi</li>
+          <li>Bồi thường thiệt hại theo quy định pháp luật</li>
+          <li>Hỗ trợ kỹ thuật 24/7 cho sự cố hệ thống</li>
+          <li>Đảm bảo thời gian hoạt động uptime 99.9%</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-section" id="contact-section">
+    <div class="section-header">
+      <h2 class="section-title">Liên Hệ & Hỗ Trợ</h2>
+    </div>
+    <div class="section-content">
+      <div class="content-item">
+        <p>
+          Để được hỗ trợ về điều khoản dịch vụ hoặc báo cáo vi phạm, vui lòng
+          liên hệ:
+        </p>
+
+        <div class="contact-flex">
+          <div class="contact-item">
+            <i class="fas fa-envelope"></i>
+            <div class="contact-info">
+              <strong>Hỗ trợ pháp lý</strong>
+              <span>support@securemedia.vn</span>
+            </div>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-phone"></i>
+            <div class="contact-info">
+              <strong>Hotline</strong>
+              <span>1900 XXXX</span>
+            </div>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-clock"></i>
+            <div class="contact-info">
+              <strong>Thời gian làm việc</strong>
+              <span>8:00 - 18:00 (Thứ 2 - Thứ 6)</span>
+            </div>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <div class="contact-info">
+              <strong>Trụ sở chính</strong>
+              <span>Cần Thơ, Việt Nam</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="content-alert">
+        <i class="fas fa-info-circle"></i>
+        <div>
+          <strong>Cam kết cuối cùng:</strong> Bằng việc sử dụng dịch vụ
+          SecureMedia, bạn xác nhận đã đọc, hiểu và đồng ý với tất cả các điều
+          khoản trên. Chúng tôi cam kết bảo vệ bạn bằng cả sức mạnh pháp luật và
+          công nghệ tiên tiến nhất.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script src="{% static 'js/terms.js' %}"></script>
+{% endblock %}

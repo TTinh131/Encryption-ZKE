@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureMedia - Error 404</title>
+    <link rel="icon" href="/static/images/logo.png" type="image/x-icon">
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #8b5cf6;
+            --primary-hover: #7c3aed;
+            --primary-light: #a78bfa;
+            --primary-dark: #6d28d9;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
+            --shadow-lg: 0 10px 40px rgba(139, 92, 246, 0.15);
+            --gradient-primary: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            color: var(--text-primary);
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            display: flex;
+            align-items: center;
+        }
+
+        .page_404 {
+            width: 100%;
+        }
+
+        .error-bg {
+            background-image: url('/static/images/404.gif');
+            height: 580px;
+            background-position: center;
+            background-repeat: no-repeat;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .error-code {
+            font-size: 10rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            line-height: 1;
+        }
+
+        .error-title {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-top: -17rem;
+        }
+
+        .error-description {
+            color: var(--text-secondary);
+            font-size: 1.4rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .caveman-message {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 16px;
+            border-left: 6px solid var(--primary-color);
+            margin: 1rem 0;
+            text-align: left;
+            box-shadow: var(--shadow);
+        }
+
+        .caveman-message strong {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .btn-error {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow);
+            font-size: 1.2rem;
+        }
+
+        .btn-error:hover {
+            background: var(--primary-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <section class="page_404">
+        <div class="container">
+            <div class="row">    
+                <div class="col-sm-12">
+                    <div class="text-center">
+                        <div class="error-bg">
+                            <h1 class="error-code">404</h1>
+                        </div>
+
+                        <h1 class="error-title">Úi! Trang này đã "giấu tin" quá tốt!</h1>
+                        
+                        <div class="caveman-message">
+                            <p>
+                                <strong>Người cổ đại nói:</strong> "Trang này biến mất như bí mật trong hang động! 
+                                Ngay cả khủng long cũng không thể tìm thấy nó!"
+                            </p>
+                        </div>
+
+                        <p class="error-description">
+                            Chúng tôi đã dùng cả thuật toán ZKE và công cụ đá để tìm, nhưng trang này đã ẩn mình quá hoàn hảo!
+                        </p>
+
+                        <a href="/" class="btn-error">Về Hang Động Chính</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

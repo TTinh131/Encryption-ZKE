@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" href="/static/images/logo.png" type="image/x-icon">
+<title>SecureMedia - Báo Cáo Hoạt Động</title>
+<link rel="stylesheet" href="/static/css/main.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+/* Reset cho in ấn */
+@page {
+    size: A4;
+    margin: 15mm;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #333;
+    background: #fff;
+    padding: 20px;
+}
+
+.print-container {
+    max-width: 100%;
+    margin: 0 auto;
+    background: #fff;
+}
+
+.print-header {
+    text-align: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #8b5cf6;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.logo-img {
+    width: 50px;
+    height: 50px;
+}
+
+.system-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: #8b5cf6;
+    margin: 0;
+}
+
+.report-title {
+    font-size: 20px;
+    color: #333;
+    text-transform: uppercase;
+}
+
+/* Thông tin cơ bản */
+.basic-info-section {
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px #8b5cf64f;
+}
+
+.basic-info-icon {
+    font-size: 24px;
+    color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.1);
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.basic-info-title {
+    font-size: 15px;
+    color: #8b5cf6;
+    margin-bottom: 10px;
+}
+
+.basic-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+}
+
+.basic-info-card {
+    background: white;
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.basic-info-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border-color: #c4b5fd;
+}
+
+.basic-info-card-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 15px;
+}
+
+.basic-info-card-content {
+    flex: 1;
+}
+
+.basic-info-card-label {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.basic-info-card-value {
+    font-size: 15px;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.basic-info-card-value .date-range {
+    color: #059669;
+    font-weight: 600;
+}
+
+.basic-info-card-value .all-time {
+    color: #8b5cf6;
+}
+
+/* Phần thống kê */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border-color: #c4b5fd;
+}
+
+.stat-card-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.stat-content {
+    flex: 1;
+}
+
+/* Bộ lọc */
+.filter-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filter-tag {
+    background: white;
+    color: #7c3aed;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid #c4b5fd;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Bảng dữ liệu */
+.data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.data-table thead {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.data-table th {
+    padding: 10px;
+    color: white;
+    font-weight: 700;
+    position: relative;
+}
+
+.data-table th:after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 15px;
+    bottom: 15px;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.data-table th:last-child:after {
+    display: none;
+}
+
+.data-table th:nth-child(1) { width: 5px; }
+.data-table th:nth-child(2) { width: 90px; }
+.data-table th:nth-child(3) { width: 200px; }
+.data-table th:nth-child(4) { width: 75px; }
+.data-table th:nth-child(5) { width: 100px; }
+.data-table th:nth-child(6) { width: 85px; }
+.data-table th:nth-child(7) { width: 60px; }
+.data-table th:nth-child(8) { width: 75px; }
+.data-table th:nth-child(9) { width: 90px; }
+
+.data-table tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.2s ease;
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: rgb(139 92 246 / 6%);
+}
+
+.data-table tbody tr:hover {
+    background-color: #dbcfffa0;
+}
+
+.data-table td {
+    padding: 10px;
+}
+
+.stt-cell {
+    text-align: center;
+    font-weight: 600;
+}
+
+.action-cell, .date-cell, .time-cell {
+    font-weight: 600;
+}
+
+.action-encrypt {
+    color: #059669;
+    background: rgba(5, 150, 105, 0.1);
+    padding: 5px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    border: 1px solid rgba(5, 150, 105, 0.2);
+}
+
+.action-decrypt {
+    color: #dc2626;
+    background: rgba(220, 38, 38, 0.1);
+    padding: 5px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.action-steganography {
+    color: #7c3aed;
+    background: rgba(124, 58, 237, 0.1);
+    padding: 5px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    border: 1px solid rgba(124, 58, 237, 0.2);
+}
+
+.file-cell {
+    font-weight: 600;
+    word-break: break-word;
+}
+
+.size-cell {
+    font-weight: 600;
+    text-align: right;
+}
+
+.algo-cell {
+    font-weight: 600;
+    color: #7c3aed;
+    background: rgba(139, 92, 246, 0.1);
+    padding: 5px;
+    border-radius: 4px;
+    display: inline-block;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    font-size: 10px;
+}
+
+.time-cell {
+    text-align: center;
+}
+
+.execution-cell {
+    font-weight: 600;
+    color: #7c3aed;
+    text-align: right;
+}
+
+.status-cell {
+    text-align: center;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 5px;
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: 800;
+    min-width: 90px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-transform: uppercase;
+}
+
+.status-success {
+    background: linear-gradient(135deg, #00ffabe8, #003b29);
+    color: white;
+}
+
+.status-pending {
+    background: linear-gradient(135deg, #ffdfa7ff, #d97706);
+    color: white;
+}
+
+.status-error {
+    background: linear-gradient(135deg, #e89696, #e50000);
+    color: white;
+}
+
+/* Footer */
+.print-footer {
+    margin-top: 20px;
+    border-top: 2px solid #8b5cf6;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    font-style: italic;
+    font-weight: 600;
+}
+
+.footer-note {
+    font-style: italic;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Không có dữ liệu */
+.no-data {
+    text-align: center;
+    padding: 50px 20px !important;
+    color: #94a3b8;
+    font-style: italic;
+    font-size: 14px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.no-data-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.3;
+    display: block;
+}
+
+/* Hàng tổng kết */
+.summary-row {
+    background: #e7e2fc !important;
+    border-top: 2px solid #8c63eb;
+}
+
+.summary-cell {
+    font-weight: 750;
+    color: #5e00ff;
+}
+
+/* Responsive cho in ấn */
+@media print {
+    body {
+        padding: 0;
+        font-size: 11px;
+        margin: 0;
+        background: #fff !important;
+        position: relative;
+        min-height: 100vh;
+    }
+    
+    .print-container {
+        padding: 0;
+        box-shadow: none;
+        border: none;
+        margin: 0;
+        max-width: 100%;
+        position: relative;
+        padding-bottom: 60px; /* Tạo khoảng trống cho footer */
+    }
+    
+    /* Giữ nguyên màu nền và định dạng bảng */
+    .data-table thead {
+        background: #8b5cf6 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .data-table tbody tr:nth-child(even) {
+        background-color: rgb(139 92 246 / 6%) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .status-success {
+        background: linear-gradient(135deg, #00ffabe8, #003b29) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .status-pending {
+        background: linear-gradient(135deg, #ffdfa7ff, #d97706) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .status-error {
+        background: linear-gradient(135deg, #e89696, #e50000) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    /* Đảm bảo không bị cắt trang */
+    thead {
+        display: table-header-group;
+    }
+    
+    tbody {
+        display: table-row-group;
+    }
+    
+    tr {
+        page-break-inside: avoid;
+    }
+    
+    /* Giữ nguyên tất cả - loại bỏ hiệu ứng hover */
+    .basic-info-section {
+        box-shadow: 0 4px 6px -1px #8b5cf64f !important;
+        border: 1px solid #e2e8f0 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    /* Loại bỏ tất cả hiệu ứng hover và transition */
+    .basic-info-card:hover,
+    .stat-card:hover,
+    .data-table tbody tr:hover {
+        transform: none !important;
+        box-shadow: none !important;
+        background-color: inherit !important;
+        border-color: inherit !important;
+    }
+    
+    /* Tắt tất cả transition */
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+    
+    /* Giữ nguyên màu nền cho các card */
+    .basic-info-card {
+        background: white !important;
+        border: 1px solid #e2e8f0 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .stat-card {
+        background: white !important;
+        border: 1px solid #e2e8f0 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .basic-info-card-icon {
+        background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    /* Giữ nguyên gradient cho các badge trạng thái */
+    .status-success {
+        background: linear-gradient(135deg, #00ffabe8, #003b29) !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .status-pending {
+        background: linear-gradient(135deg, #ffdfa7ff, #d97706) !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .status-error {
+        background: linear-gradient(135deg, #e89696, #e50000) !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    /* Giữ nguyên màu cho các loại hành động */
+    .action-encrypt {
+        background: rgba(5, 150, 105, 0.1) !important;
+        color: #059669 !important;
+        border: 1px solid rgba(5, 150, 105, 0.2) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .action-decrypt {
+        background: rgba(220, 38, 38, 0.1) !important;
+        color: #dc2626 !important;
+        border: 1px solid rgba(220, 38, 38, 0.2) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .action-steganography {
+        background: rgba(124, 58, 237, 0.1) !important;
+        color: #7c3aed !important;
+        border: 1px solid rgba(124, 58, 237, 0.2) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    /* Giữ nguyên màu cho thuật toán */
+    .algo-cell {
+        background: rgba(139, 92, 246, 0.1) !important;
+        color: #7c3aed !important;
+        border: 1px solid rgba(139, 92, 246, 0.2) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    /* Giữ nguyên dòng tổng kết */
+    .summary-row {
+        background: #e7e2fc !important;
+        border-top: 2px solid #8c63eb !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    /* Footer ở cuối trang - KHÔNG DÙNG fixed nữa */
+    .print-footer {
+        position: relative;
+        bottom: auto;
+        left: auto;
+        right: auto;
+        background: white !important;
+        border-top: 2px solid #8b5cf6 !important;
+        padding: 10px 0;
+        font-size: 10px;
+        margin-top: 20px;
+        width: 100%;
+        box-sizing: border-box;
+        page-break-inside: avoid;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        page-break-before: avoid;
+        page-break-after: avoid;
+    }
+    
+    .footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0;
+        font-style: italic;
+        font-weight: 600;
+    }
+    
+    /* Đảm bảo footer không bị cắt khi sang trang */
+    .print-footer {
+        position: static;
+        margin-top: auto;
+    }
+    
+    /* Thiết lập cho footer xuất hiện ở mỗi trang */
+    @page {
+        @bottom-center {
+            content: element(footer);
+        }
+        margin-bottom: 30mm; /* Tạo khoảng cho footer */
+    }
+    
+    .print-footer {
+        position: running(footer);
+    }
+}
+
+/* Hiển thị trên màn hình - giữ nguyên tất cả hiệu ứng hover */
+@media screen {
+    .print-container {
+        max-width: 210mm;
+        min-height: 297mm;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        margin: 20px auto;
+        position: relative;
+    }
+    
+    .print-footer {
+        margin-top: 20px;
+        border-top: 2px solid #8b5cf6;
+        padding: 10px 0;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="print-container">
+    <div class="print-header">
+        <div class="logo-section">
+            <img src="/static/images/logo.png" alt="SecureMedia" class="logo-img">
+            <div>
+                <h1 class="system-name">SecureMedia</h1>
+                <h2 class="report-title">BÁO CÁO HOẠT ĐỘNG HỆ THỐNG</h2>
+            </div>
+        </div>
+    </div>
+    <!-- Thông tin cơ bản -->
+    <div class="basic-info-section">
+        <h3 class="basic-info-title">Thông Tin Báo Cáo</h3>
+        <div class="basic-info-grid">
+            <div class="basic-info-card">
+                <div class="basic-info-card-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="basic-info-card-content">
+                    <div class="basic-info-card-label">Người dùng</div>
+                    <div class="basic-info-card-value">{{ username }}</div>
+                </div>
+            </div>
+            
+            <div class="basic-info-card">
+                <div class="basic-info-card-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="basic-info-card-content">
+                    <div class="basic-info-card-label">Thời gian in</div>
+                    <div class="basic-info-card-value">{{ printed_at|date:"d/m/Y H:i:s" }}</div>
+                </div>
+            </div>
+            
+            <div class="basic-info-card">
+                <div class="basic-info-card-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="basic-info-card-content">
+                    <div class="basic-info-card-label">Tổng hoạt động</div>
+                    <div class="basic-info-card-value">{{ activities|length }} bản ghi</div>
+                </div>
+            </div>
+            
+            <div class="basic-info-card">
+                <div class="basic-info-card-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="basic-info-card-content">
+                    <div class="basic-info-card-label">Phạm vi thời gian</div>
+                    <div class="basic-info-card-value">
+                        {% if filters.date_range %}
+                            <span class="date-range">{{ filters.date_range }}</span>
+                        {% else %}
+                            <span class="all-time">Toàn bộ thời gian</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Phần thống kê -->
+    <div class="basic-info-section">
+        <h3 class="basic-info-title">Thống Kê Chi Tiết</h3>
+        <div class="stats-grid" style="margin-bottom: 10px;">
+            <div class="stat-card">
+                <div class="stat-card-inner">
+                    <div class="basic-info-card-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="basic-info-card-label">Thành công</div>
+                        <div class="basic-info-card-value">{{ success_count }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-card-inner">
+                    <div class="basic-info-card-icon">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="basic-info-card-label">Thất bại</div>
+                        <div class="basic-info-card-value">{{ failed_count }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-card-inner">
+                    <div class="basic-info-card-icon">
+                        <i class="fas fa-stopwatch"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="basic-info-card-label">Thời gian TB</div>
+                        <div class="basic-info-card-value">{{ avg_time|floatformat:2 }}<span class="basic-info-card-value">s</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-inner">
+                    <div class="basic-info-card-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="basic-info-card-label">Mã hóa</div>
+                        <div class="basic-info-card-value">{{ encryption_count }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-card-inner">
+                    <div class="basic-info-card-icon">
+                        <i class="fas fa-unlock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="basic-info-card-label">Giải mã</div>
+                        <div class="basic-info-card-value">{{ decryption_count }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-card-inner">
+                    <div class="basic-info-card-icon">
+                        <i class="fas fa-eye-slash"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="basic-info-card-label">Giấu tin</div>
+                        <div class="basic-info-card-value">{{ hide_data_count }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-card-inner">
+                    <div class="basic-info-card-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="basic-info-card-label">Trích xuất</div>
+                        <div class="basic-info-card-value">{{ extract_data_count }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bộ lọc (nếu có) -->
+    {% if filters.type or filters.status or filters.date_range %}
+    <div class="basic-info-section">
+        <h3 class="basic-info-title">Bộ lọc áp dụng:</h3>
+        <div class="filter-tags">
+            {% if filters.type %}
+            <span class="filter-tag">Loại: {{ filters.type }}</span>
+            {% endif %}
+            {% if filters.status %}
+            <span class="filter-tag">Trạng thái: {{ filters.status }}</span>
+            {% endif %}
+            {% if filters.date_range %}
+            <span class="filter-tag">Khoảng thời gian: {{ filters.date_range }}</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Bảng dữ liệu -->
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Loại thao tác</th>
+                <th>Tên file</th>
+                <th>Kích thước</th>
+                <th>Thuật toán</th>
+                <th>Ngày</th>
+                <th>Giờ</th>
+                <th>Thời gian xử lý</th>
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        
+        <tbody>
+            {% for a in activities %}
+            <tr>
+                <td class="stt-cell">{{ forloop.counter }}</td>
+                <td>
+                    {% if a.activity_type == 'encrypt' %}
+                    <span class="action-cell action-encrypt">{{ a.get_activity_type_display }}</span>
+                    {% elif a.activity_type == 'decrypt' %}
+                    <span class="action-cell action-decrypt">{{ a.get_activity_type_display }}</span>
+                    {% elif a.activity_type == 'steganography' %}
+                    <span class="action-cell action-steganography">{{ a.get_activity_type_display }}</span>
+                    {% else %}
+                    <span class="action-cell">{{ a.get_activity_type_display }}</span>
+                    {% endif %}
+                </td>
+                <td class="file-cell">{{ a.input_filename }}</td>
+                <td class="size-cell">{{ a.file_size|filesizeformat }}</td>
+                <td>
+                    <span class="algo-cell">{{ a.algorithm|default:"-" }}</span>
+                </td>
+                <td class="date-cell">{{ a.created_at|date:"d/m/Y" }}</td>
+                <td class="time-cell">{{ a.created_at|date:"H:i" }}</td>
+                <td class="execution-cell">
+                    {% if a.execution_time %}{{ a.execution_time|floatformat:2 }}s{% else %}-{% endif %}
+                </td>
+                <td class="status-cell">
+                    {% if a.status == 'success' %}
+                    <span class="status-badge status-success">THÀNH CÔNG</span>
+                    {% elif a.status == 'processing' %}
+                    <span class="status-badge status-pending">ĐANG XỬ LÝ</span>
+                    {% elif a.status == 'failed' %}
+                    <span class="status-badge status-error">THẤT BẠI</span>
+                    {% else %}
+                    <span class="status-badge">{{ a.get_status_display }}</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9" class="no-data">
+                    <span class="no-data-icon">📊</span>
+                    Không có dữ liệu hoạt động để hiển thị
+                </td>
+            </tr>
+            {% endfor %}
+            
+            {% if activities %}
+            <tr class="summary-row">
+                <td colspan="3" class="summary-cell">Tổng cộng: {{ activities|length }} hoạt động</td>
+                <td class="summary-cell">{{ total_size|filesizeformat }}</td>
+                <td colspan="3"></td>
+                <td class="summary-cell">{{ total_time|floatformat:2 }}s</td>
+                <td></td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+    
+    <div class="print-footer">
+        <div class="footer-content">
+            Tài liệu được tạo tự động từ hệ thống SecureMedia
+        </div>
+    </div>
+</div>
+</body>
+</html>

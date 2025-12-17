@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}SecureMedia - Đăng Xuất{% endblock %}
+{% block content %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Chuyển hướng ngay lập tức về trang chủ
+    window.location.href = "{% url 'home' %}";
+});
+</script>
+{% endblock %}
