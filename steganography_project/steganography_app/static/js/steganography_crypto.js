@@ -98,11 +98,11 @@ class SteganographyCrypto {
         };
       }
 
-      console.log("Payload trước khi mã hóa:", {
-        metadata: payload.metadata,
-        dataLength: payload.data.length,
-        dataType: payload.dataType,
-      });
+      // console.log("Payload trước khi mã hóa:", {
+      //   metadata: payload.metadata,
+      //   dataLength: payload.data.length,
+      //   dataType: payload.dataType,
+      // });
 
       // Mã hóa toàn bộ payload
       const payloadStr = JSON.stringify(payload);

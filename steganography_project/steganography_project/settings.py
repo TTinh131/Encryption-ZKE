@@ -167,7 +167,7 @@ SERVER_EMAIL = 'SecureMedia <tinhb2203743@student.ctu.edu.vn>'
 
 # Cấu hình Session
 # SESSION CONFIG
-SESSION_COOKIE_AGE = 180               # 3 phút hết hạn
+SESSION_COOKIE_AGE = 300               # 3 phút hết hạn
 SESSION_SAVE_EVERY_REQUEST = True        # reset khi có thao tác
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True   # đóng trình duyệt = logout
 SESSION_COOKIE_SECURE = False            # để True khi lên HTTPS

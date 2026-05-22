@@ -417,8 +417,8 @@ class ZKECrypto {
       publicKey: keyPair.publicKey,
       privateKey: keyPair.privateKey,
       created: now.toISOString(),
-      keyName: keyName || "Auto-generated",
-      description: `Key pair for ${algorithm} generated on ${dateStr}`,
+      keyName: keyName || "Tự động tạo",
+      description: `Cập khóa cho ${algorithm} được tọa vào ${dateStr}`,
     };
 
     localStorage.setItem(key, JSON.stringify(storageData));
