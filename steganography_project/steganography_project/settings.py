@@ -152,16 +152,16 @@ LOGIN_REDIRECT_URL = 'dashboard'  # Sau khi đăng nhập
 LOGOUT_REDIRECT_URL = 'home'      # Sau khi đăng xuất
 
 # 11. Cấu hình Email 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'tinhb2203743@student.ctu.edu.vn'
-EMAIL_HOST_PASSWORD = 'kyvc qdhu qngu riin'
+# EMAIL_BACKEND = ''
+# EMAIL_HOST = ''
+# EMAIL_PORT = 
+# EMAIL_USE_TLS =
+# EMAIL_HOST_USER = ''
+# EMAIL_HOST_PASSWORD = ''
 
-# Cấu hình hiển thị email
-DEFAULT_FROM_EMAIL = 'SecureMedia <tinhb2203743@student.ctu.edu.vn>'
-SERVER_EMAIL = 'SecureMedia <tinhb2203743@student.ctu.edu.vn>'
+# # Cấu hình hiển thị email
+# DEFAULT_FROM_EMAIL = ''
+# SERVER_EMAIL = ''
 
 # 12. Bảo mật và CSRF
 
