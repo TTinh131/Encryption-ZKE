@@ -87,20 +87,20 @@ WSGI_APPLICATION = 'steganography_project.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 # 6. Cấu hình cơ sở dữ liệu
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "ct492",
-        "USER": "root",
-        "PASSWORD": "130104",
-        "HOST": "localhost",
-        "PORT": "3307",
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            'charset': 'utf8mb4',
-        }
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.mysql",
+#         "NAME": "",
+#         "USER": "",
+#         "PASSWORD": "",
+#         "HOST": "",
+#         "PORT": "",
+#         'OPTIONS': {
+#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+#             'charset': 'utf8mb4',
+#         }
+#     }
+# }
 
 # 7. Cấu hình xác thực và mật khẩu
 # Password validation
